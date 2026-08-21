@@ -35,6 +35,8 @@ const Accounts = {
         const accounts = this.getAll();
 
         login = login.trim();
+        password = password.trim();
+
 
         if (!login) {
 
@@ -159,10 +161,9 @@ const Accounts = {
 
     autoLogin() {
 
-        const login =
-            localStorage.getItem(
-                "skywildCurrentAccount"
-            );
+        const login = localStorage.getItem(
+            "skywildCurrentAccount"
+        );
 
 
         if (!login) {
@@ -207,6 +208,41 @@ const Accounts = {
     },
 
 
+    getLevelFromXP(xp) {
+
+        let level = 1;
+
+
+        if (
+            typeof EVOLUTIONS === "undefined"
+        ) {
+
+            return level;
+
+        }
+
+
+        for (const evolution of EVOLUTIONS) {
+
+            if (
+                xp >= evolution.xp
+            ) {
+
+                level = evolution.level;
+
+            }
+
+        }
+
+
+        return Math.min(
+            45,
+            level
+        );
+
+    },
+
+
     saveProgress(xp, nickname) {
 
         if (!this.current) {
@@ -226,42 +262,195 @@ const Accounts = {
         }
 
 
-        accounts[this.current].xp =
-            Math.max(
-                0,
-                Math.floor(xp)
-            );
+        accounts[this.current].xp = Math.max(
+            0,
+            Math.floor(xp)
+        );
 
 
-        accounts[this.current].nickname =
-            nickname;
+        if (nickname) {
 
-
-        let level = 1;
-
-
-        for (const evolution of EVOLUTIONS) {
-
-            if (
-                xp >= evolution.xp
-            ) {
-
-                level =
-                    evolution.level;
-
-            }
+            accounts[this.current].nickname =
+                nickname;
 
         }
 
 
         accounts[this.current].level =
-            Math.min(
-                45,
-                level
-            );
+            this.getLevelFromXP(xp);
 
 
         this.saveAll(accounts);
+
+
+        this.updateMenu();
+
+    },
+
+
+    updateMenu() {
+
+        const account =
+            this.getAccount();
+
+
+        if (!account) {
+
+            return;
+
+        }
+
+
+        const accountInfo =
+            document.querySelector(
+                "#accountInfo"
+            );
+
+
+        if (accountInfo) {
+
+            accountInfo.textContent =
+                account.nickname;
+
+        }
+
+
+        const levelText =
+            document.querySelector(
+                ".level-text"
+            );
+
+
+        if (levelText) {
+
+            levelText.textContent =
+                `УРОВЕНЬ ${account.level} / 45`;
+
+        }
+
+
+        const menuXpText =
+            document.querySelector(
+                "#menuXpText"
+            );
+
+
+        if (menuXpText) {
+
+            menuXpText.textContent =
+                `${account.xp} XP`;
+
+        }
+
+
+        const menuXpFill =
+            document.querySelector(
+                "#menuXpFill"
+            );
+
+
+        if (menuXpFill) {
+
+            let currentXP = 0;
+            let nextXP = 100;
+
+
+            if (
+                typeof EVOLUTIONS !== "undefined"
+            ) {
+
+                const currentEvolution =
+                    EVOLUTIONS.find(
+                        evolution =>
+                            evolution.level === account.level
+                    );
+
+
+                const nextEvolution =
+                    EVOLUTIONS.find(
+                        evolution =>
+                            evolution.level ===
+                            account.level + 1
+                    );
+
+
+                if (currentEvolution) {
+
+                    currentXP =
+                        currentEvolution.xp;
+
+                }
+
+
+                if (nextEvolution) {
+
+                    nextXP =
+                        nextEvolution.xp;
+
+                }
+
+            }
+
+
+            let percent = 100;
+
+
+            if (
+                account.level < 45
+            ) {
+
+                percent =
+                    (
+                        (account.xp - currentXP) /
+                        (nextXP - currentXP)
+                    ) * 100;
+
+            }
+
+
+            percent = Math.max(
+                0,
+                Math.min(
+                    100,
+                    percent
+                )
+            );
+
+
+            menuXpFill.style.width =
+                `${percent}%`;
+
+        }
+
+
+        const evolutionName =
+            document.querySelector(
+                ".evolution-name"
+            );
+
+
+        if (
+            evolutionName &&
+            typeof EVOLUTIONS !== "undefined"
+        ) {
+
+            const evolution =
+                EVOLUTIONS.find(
+                    item =>
+                        item.level === account.level
+                );
+
+
+            if (evolution) {
+
+                evolutionName.textContent =
+                    evolution.name ||
+                    evolution.title ||
+                    `Эволюция ${account.level}`;
+
+            }
+
+        }
 
     },
 
