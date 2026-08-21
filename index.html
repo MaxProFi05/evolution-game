@@ -1,24 +1,150 @@
 <!doctype html>
-<html lang="ru"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Skywild Evolution</title>
 <link rel="stylesheet" href="css/style.css">
-</head><body>
+</head>
+
+<body>
+
 <canvas id="game"></canvas>
-<div id="menu" class="overlay"><div class="card">
-<h1>SKYWILD EVOLUTION</h1><p>Выживай. Охоться. Эволюционируй.</p>
-<input id="nickname" placeholder="Имя игрока" maxlength="16">
-<button id="play">ИГРАТЬ</button>
-<p class="small">Сохранение работает в браузере.</p></div></div>
-<div id="hud" class="hidden">
-<div class="panel"><b id="formName">Искра</b>
-<div class="row">❤️ <div class="bar"><i id="hp"></i></div></div>
-<div class="row">⚡ <div class="bar energy"><i id="energy"></i></div></div>
-<div class="row" id="airRow">🫧 <div class="bar air"><i id="air"></i></div></div>
-<div class="row">⭐ <div class="bar xp"><i id="xp"></i></div></div>
-<div id="info"></div></div>
-<div class="help">ЛКМ — движение и атака<br>WASD — движение<br>SPACE — ускорение</div>
+
+<!-- АВТОРИЗАЦИЯ -->
+<div id="authScreen" class="overlay">
+    <div class="card">
+
+        <h1>SKYWILD EVOLUTION</h1>
+        <p>Войди в аккаунт или создай новый</p>
+
+        <input id="authLogin" placeholder="Логин" maxlength="16">
+
+        <input
+            id="authPassword"
+            type="password"
+            placeholder="Пароль"
+            maxlength="32"
+        >
+
+        <button id="loginBtn">ВОЙТИ</button>
+
+        <button id="registerBtn">
+            СОЗДАТЬ АККАУНТ
+        </button>
+
+        <p id="authMessage" class="small"></p>
+
+    </div>
 </div>
-<div id="minimapBox" class="hidden"><canvas id="minimap" width="180" height="110"></canvas><div id="biome"></div></div>
-<script src="js/data.js"></script><script src="js/game.js"></script>
-</body></html>
+
+
+<!-- МЕНЮ ИГРЫ -->
+<div id="menu" class="overlay hidden">
+
+    <div class="card">
+
+        <h1>SKYWILD EVOLUTION</h1>
+
+        <p id="accountInfo"></p>
+
+        <input
+            id="nickname"
+            placeholder="Имя игрока"
+            maxlength="16"
+        >
+
+        <button id="play">
+            ИГРАТЬ
+        </button>
+
+        <button id="logoutBtn">
+            ВЫЙТИ ИЗ АККАУНТА
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ИНТЕРФЕЙС ИГРЫ -->
+<div id="hud" class="hidden">
+
+    <div class="panel">
+
+        <b id="formName">
+            Уровень 1
+        </b>
+
+        <div class="row">
+            ❤️
+            <div class="bar">
+                <i id="hp"></i>
+            </div>
+        </div>
+
+        <div class="row">
+            ⚡
+            <div class="bar energy">
+                <i id="energy"></i>
+            </div>
+        </div>
+
+        <div class="row">
+            🫧
+            <div class="bar air">
+                <i id="air"></i>
+            </div>
+        </div>
+
+        <div class="row">
+            💧
+            <div class="bar water">
+                <i id="water"></i>
+            </div>
+        </div>
+
+        <div class="row">
+            ⭐
+            <div class="bar xp">
+                <i id="xp"></i>
+            </div>
+        </div>
+
+        <div id="info"></div>
+
+    </div>
+
+    <div class="help">
+
+        ЛКМ — движение<br>
+        WASD — движение<br>
+        SPACE — ускорение
+
+    </div>
+
+</div>
+
+
+<!-- МИНИКАРТА -->
+<div id="minimapBox" class="hidden">
+
+    <canvas
+        id="minimap"
+        width="180"
+        height="110"
+    ></canvas>
+
+    <div id="biome"></div>
+
+</div>
+
+
+<!-- СКРИПТЫ -->
+<script src="js/data.js"></script>
+<script src="js/accounts.js"></script>
+<script src="js/anticheat.js"></script>
+<script src="js/game.js"></script>
+
+</body>
+</html>
