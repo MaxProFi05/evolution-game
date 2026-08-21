@@ -1,195 +1,1411 @@
-const c=document.querySelector('#game'),g=c.getContext('2d'),mini=document.querySelector('#minimap'),mg=mini.getContext('2d');
-function resize(){c.width=innerWidth;c.height=innerHeight}addEventListener('resize',resize);resize();
+const c = document.querySelector("#game");
 
-const mouse={x:0,y:0,down:false},keys=new Set();
-let player,foods=[],cam={x:0,y:0},last=0,running=false;
-const imgs={};
-EVOLUTIONS.forEach(e=>{if(!imgs[e.sprite]){imgs[e.sprite]=new Image();imgs[e.sprite].src=e.sprite}});
+const g = c.getContext("2d");
 
-const rnd=(a,b)=>Math.random()*(b-a)+a;
-function biome(x,y){return BIOMES.find(b=>x>=b.x&&x<b.x+b.w&&y>=b.y&&y<b.y+b.h)||BIOMES[0]}
-function evo(){let e=EVOLUTIONS[0];for(const x of EVOLUTIONS)if(player.xp>=x.xp)e=x;return e}
+const mini =
+    document.querySelector("#minimap");
 
-function init(){
-  player={x:1300,y:1700,xp:+localStorage.skywildXP||0,hp:100,en:100,air:100,water:100,kills:0,angle:0};
-  foods=[];
-  for(let i=0;i<1500;i++)food();
-  if(typeof AntiCheat!=="undefined")AntiCheat.resetChecks(player);
-  running=true;last=performance.now();requestAnimationFrame(loop);
+const mg =
+    mini.getContext("2d");
+
+
+function resize() {
+
+    c.width = innerWidth;
+
+    c.height = innerHeight;
+
 }
 
-function food(){
-  const b=BIOMES[Math.random()*BIOMES.length|0];
-  const maxTier=Math.min(45,Math.max(3,evo().tier+5));
-  const tier=1+Math.floor(Math.random()*maxTier);
-  foods.push({
-    x:rnd(b.x+30,b.x+b.w-30),
-    y:rnd(b.y+30,b.y+b.h-30),
-    r:rnd(5,11),
-    tier,
-    xp:Math.round(8+tier*8+tier*tier*1.4)
-  });
-}
 
-document.querySelector('#play').onclick=()=>{
-  const n=document.querySelector('#nickname').value.trim()||'Игрок';
-  localStorage.skywildName=n;
-  document.querySelector('#menu').classList.add('hidden');
-  document.querySelector('#hud').classList.remove('hidden');
-  document.querySelector('#minimapBox').classList.remove('hidden');
-  init();
+addEventListener(
+    "resize",
+    resize
+);
+
+resize();
+
+
+
+const mouse = {
+
+    x: 0,
+    y: 0,
+    down: false
+
 };
 
-c.onmousemove=e=>{mouse.x=e.clientX;mouse.y=e.clientY};
-c.onmousedown=()=>mouse.down=true;
-addEventListener('mouseup',()=>mouse.down=false);
-addEventListener('keydown',e=>keys.add(e.code));
-addEventListener('keyup',e=>keys.delete(e.code));
 
-function update(dt){
-  const e=evo();
-  const oldX=player.x,oldY=player.y;
-  const b=biome(player.x,player.y);
-  let dx=0,dy=0;
+const keys = new Set();
 
-  if(mouse.down){dx=mouse.x-c.width/2;dy=mouse.y-c.height/2}
-  if(keys.has('KeyA'))dx-=220;
-  if(keys.has('KeyD'))dx+=220;
-  if(keys.has('KeyW'))dy-=220;
-  if(keys.has('KeyS'))dy+=220;
 
-  const d=Math.hypot(dx,dy);
-  const boost=keys.has('Space')&&player.en>0;
+let player;
 
-  if(d){
-    let speed=e.speed*(boost?1.5:1);
-    if(b.kind==='water'&&e.air)speed*=.55;
-    player.x+=dx/d*speed*dt;
-    player.y+=dy/d*speed*dt;
-    player.angle=Math.atan2(dy,dx);
-  }
+let foods = [];
 
-  player.x=Math.max(0,Math.min(WORLD.w,player.x));
-  player.y=Math.max(0,Math.min(WORLD.h,player.y));
+let cam = {
 
-  player.en=Math.max(0,Math.min(100,player.en+(boost?-28:15)*dt));
+    x: 0,
+    y: 0
 
-  // Воздух для наземных/воздушных форм в воде
-  if(b.kind==='water'&&e.air){
-    player.air=Math.max(0,player.air-20*dt);
-    if(player.air<=0)player.hp-=7*dt;
-  }else{
-    player.air=Math.min(100,player.air+30*dt);
-  }
+};
 
-  // Жажда
-  player.water=Math.max(0,player.water-0.45*dt);
-  if(b.kind==='water')player.water=Math.min(100,player.water+25*dt);
-  if(player.water<=0)player.hp-=4*dt;
 
-  // Только еда даёт XP. NPC полностью удалены.
-  for(let i=foods.length-1;i>=0;i--){
-    const f=foods[i];
-    if(Math.hypot(f.x-player.x,f.y-player.y)<e.r+f.r && f.tier<=e.tier+1){
-      player.xp+=f.xp;
-      foods.splice(i,1);
-      food();
+let last = 0;
+
+let running = false;
+
+
+
+const imgs = {};
+
+
+EVOLUTIONS.forEach(e => {
+
+    if (!imgs[e.sprite]) {
+
+        imgs[e.sprite] =
+            new Image();
+
+        imgs[e.sprite].src =
+            e.sprite;
+
     }
-  }
 
-  if(player.hp<=0){
-    player.hp=100;
-    player.xp=Math.floor(player.xp*.90);
-    player.x=1300;
-    player.y=1700;
-  }
+});
 
-  if(typeof AntiCheat!=="undefined"){
-    AntiCheat.clampPlayer(player);
-    AntiCheat.validateMovement(player,oldX,oldY,dt,e.speed);
-    AntiCheat.saveSafeXP(player);
-  }else{
-    localStorage.skywildXP=Math.floor(player.xp);
-  }
 
-  cam.x+=(player.x-cam.x)*Math.min(1,dt*6);
-  cam.y+=(player.y-cam.y)*Math.min(1,dt*6);
+
+const rnd = (a, b) =>
+    Math.random() * (b - a) + a;
+
+
+
+function biome(x, y) {
+
+    return BIOMES.find(b =>
+        x >= b.x &&
+        x < b.x + b.w &&
+        y >= b.y &&
+        y < b.y + b.h
+    ) || BIOMES[0];
+
 }
 
-function sc(x,y){return[x-cam.x+c.width/2,y-cam.y+c.height/2]}
 
-function draw(){
-  g.fillStyle='#78c8e6';g.fillRect(0,0,c.width,c.height);
 
-  for(const b of BIOMES){
-    const p=sc(b.x,b.y);
-    g.fillStyle=b.color;
-    g.fillRect(p[0],p[1],b.w,b.h);
-  }
+function evo() {
 
-  for(const f of foods){
-    const p=sc(f.x,f.y);
-    const hue=(f.tier*31)%360;
-    g.fillStyle=`hsl(${hue} 85% 62%)`;
-    g.beginPath();g.arc(p[0],p[1],f.r,0,Math.PI*2);g.fill();
-  }
+    let e = EVOLUTIONS[0];
 
-  const e=evo(),p=sc(player.x,player.y),im=imgs[e.sprite];
-  g.save();
-  g.translate(p[0],p[1]);
-  g.rotate(player.angle);
 
-  if(im&&im.complete){
-    g.drawImage(im,-e.r*1.45,-e.r,e.r*2.9,e.r*2);
-  }else{
-    g.fillStyle='#fff';
-    g.beginPath();g.arc(0,0,e.r,0,Math.PI*2);g.fill();
-  }
-  g.restore();
+    for (const x of EVOLUTIONS) {
 
-  const level=e.level;
-  const next=EVOLUTIONS[Math.min(level,EVOLUTIONS.length-1)];
-  const pct=level>=45?100:(player.xp-e.xp)/(next.xp-e.xp)*100;
+        if (
+            player.xp >= x.xp
+        ) {
 
-  document.querySelector('#formName').textContent=
-    `Уровень ${level}/45 • ${e.name} • ${Math.floor(player.xp)} XP`;
+            e = x;
 
-  document.querySelector('#hp').style.width=Math.max(0,player.hp)+'%';
-  document.querySelector('#energy').style.width=player.en+'%';
-  document.querySelector('#air').style.width=player.air+'%';
+        }
 
-  const water=document.querySelector('#water');
-  if(water)water.style.width=player.water+'%';
+    }
 
-  const xp=document.querySelector('#xp');
-  if(xp)xp.style.width=Math.max(0,Math.min(100,pct))+'%';
 
-  const biomeText=document.querySelector('#biome');
-  if(biomeText)biomeText.textContent=biome(player.x,player.y).name;
+    return e;
 
-  drawMini();
 }
 
-function drawMini(){
-  mg.clearRect(0,0,180,110);
-  const sx=180/WORLD.w,sy=110/WORLD.h;
 
-  for(const b of BIOMES){
-    mg.fillStyle=b.color;
-    mg.fillRect(b.x*sx,b.y*sy,b.w*sx,b.h*sy);
-  }
 
-  mg.fillStyle='#fff';
-  mg.beginPath();
-  mg.arc(player.x*sx,player.y*sy,3,0,Math.PI*2);
-  mg.fill();
+function getAccountXP() {
+
+    const account =
+        Accounts.getAccount();
+
+
+    if (!account) {
+
+        return 0;
+
+    }
+
+
+    return Number(
+        account.xp
+    ) || 0;
+
 }
 
-function loop(t){
-  if(!running)return;
-  const dt=Math.min(.05,(t-last)/1000);
-  last=t;
-  update(dt);
-  draw();
-  requestAnimationFrame(loop);
+
+
+function init() {
+
+    const account =
+        Accounts.getAccount();
+
+
+    const savedXP =
+        getAccountXP();
+
+
+    player = {
+
+        x: 1300,
+
+        y: 1700,
+
+        xp: savedXP,
+
+        hp: 100,
+
+        en: 100,
+
+        air: 100,
+
+        water: 100,
+
+        kills: 0,
+
+        angle: 0,
+
+        nickname:
+            account?.nickname ||
+            "Игрок"
+
+    };
+
+
+    foods = [];
+
+
+    for (
+        let i = 0;
+        i < 1500;
+        i++
+    ) {
+
+        food();
+
+    }
+
+
+    if (
+        typeof AntiCheat !==
+        "undefined"
+    ) {
+
+        AntiCheat.resetChecks(
+            player
+        );
+
+    }
+
+
+    running = true;
+
+
+    last =
+        performance.now();
+
+
+    requestAnimationFrame(
+        loop
+    );
+
+}
+
+
+
+function food() {
+
+    const b =
+        BIOMES[
+            Math.random() *
+            BIOMES.length | 0
+        ];
+
+
+    const current =
+        player ?
+        evo() :
+        EVOLUTIONS[0];
+
+
+    const maxTier =
+        Math.min(
+            45,
+            Math.max(
+                3,
+                current.tier + 5
+            )
+        );
+
+
+    const tier =
+        1 +
+        Math.floor(
+            Math.random() *
+            maxTier
+        );
+
+
+    foods.push({
+
+        x: rnd(
+            b.x + 30,
+            b.x + b.w - 30
+        ),
+
+        y: rnd(
+            b.y + 30,
+            b.y + b.h - 30
+        ),
+
+        r: rnd(5, 11),
+
+        tier: tier,
+
+        xp:
+            Math.round(
+                8 +
+                tier * 8 +
+                tier * tier * 1.4
+            )
+
+    });
+
+}
+
+
+
+/* АККАУНТЫ */
+
+
+const authScreen =
+    document.querySelector(
+        "#authScreen"
+    );
+
+
+const menu =
+    document.querySelector(
+        "#menu"
+    );
+
+
+const authLogin =
+    document.querySelector(
+        "#authLogin"
+    );
+
+
+const authPassword =
+    document.querySelector(
+        "#authPassword"
+    );
+
+
+const authMessage =
+    document.querySelector(
+        "#authMessage"
+    );
+
+
+
+function openMenu() {
+
+    const account =
+        Accounts.getAccount();
+
+
+    if (!account) {
+
+        return;
+
+    }
+
+
+    authScreen.classList.add(
+        "hidden"
+    );
+
+
+    menu.classList.remove(
+        "hidden"
+    );
+
+
+    document.querySelector(
+        "#nickname"
+    ).value =
+        account.nickname;
+
+
+    document.querySelector(
+        "#accountInfo"
+    ).textContent =
+        "👤 " +
+        Accounts.current +
+        " | Уровень " +
+        account.level +
+        "/45 | " +
+        Math.floor(
+            account.xp
+        ) +
+        " XP";
+
+}
+
+
+
+/* РЕГИСТРАЦИЯ */
+
+
+document.querySelector(
+    "#registerBtn"
+).onclick = () => {
+
+    const result =
+        Accounts.register(
+            authLogin.value,
+            authPassword.value
+        );
+
+
+    authMessage.textContent =
+        result.message;
+
+
+    if (result.ok) {
+
+        openMenu();
+
+    }
+
+};
+
+
+
+/* ВХОД */
+
+
+document.querySelector(
+    "#loginBtn"
+).onclick = () => {
+
+    const result =
+        Accounts.login(
+            authLogin.value,
+            authPassword.value
+        );
+
+
+    authMessage.textContent =
+        result.message;
+
+
+    if (result.ok) {
+
+        openMenu();
+
+    }
+
+};
+
+
+
+/* АВТОВХОД */
+
+
+if (
+    Accounts.autoLogin()
+) {
+
+    openMenu();
+
+}
+
+
+
+/* ВЫХОД */
+
+
+document.querySelector(
+    "#logoutBtn"
+).onclick = () => {
+
+    Accounts.logout();
+
+
+    running = false;
+
+
+    menu.classList.add(
+        "hidden"
+    );
+
+
+    authLogin.value = "";
+
+    authPassword.value = "";
+
+
+    authScreen.classList.remove(
+        "hidden"
+    );
+
+};
+
+
+
+/* ЗАПУСК ИГРЫ */
+
+
+document.querySelector(
+    "#play"
+).onclick = () => {
+
+    const name =
+        document.querySelector(
+            "#nickname"
+        ).value.trim() ||
+        "Игрок";
+
+
+    const account =
+        Accounts.getAccount();
+
+
+    if (account) {
+
+        account.nickname =
+            name;
+
+
+        const all =
+            Accounts.getAll();
+
+
+        all[
+            Accounts.current
+        ] = account;
+
+
+        Accounts.saveAll(
+            all
+        );
+
+    }
+
+
+    menu.classList.add(
+        "hidden"
+    );
+
+
+    document.querySelector(
+        "#hud"
+    ).classList.remove(
+        "hidden"
+    );
+
+
+    document.querySelector(
+        "#minimapBox"
+    ).classList.remove(
+        "hidden"
+    );
+
+
+    init();
+
+};
+
+
+
+/* УПРАВЛЕНИЕ */
+
+
+c.onmousemove = e => {
+
+    mouse.x =
+        e.clientX;
+
+    mouse.y =
+        e.clientY;
+
+};
+
+
+c.onmousedown = () => {
+
+    mouse.down = true;
+
+};
+
+
+addEventListener(
+    "mouseup",
+    () => {
+
+        mouse.down = false;
+
+    }
+);
+
+
+addEventListener(
+    "keydown",
+    e => {
+
+        keys.add(
+            e.code
+        );
+
+    }
+);
+
+
+addEventListener(
+    "keyup",
+    e => {
+
+        keys.delete(
+            e.code
+        );
+
+    }
+);
+
+
+
+function update(dt) {
+
+    const e = evo();
+
+
+    const oldX =
+        player.x;
+
+
+    const oldY =
+        player.y;
+
+
+    const b =
+        biome(
+            player.x,
+            player.y
+        );
+
+
+    let dx = 0;
+
+    let dy = 0;
+
+
+
+    if (mouse.down) {
+
+        dx =
+            mouse.x -
+            c.width / 2;
+
+        dy =
+            mouse.y -
+            c.height / 2;
+
+    }
+
+
+    if (
+        keys.has("KeyA")
+    ) {
+
+        dx -= 220;
+
+    }
+
+
+    if (
+        keys.has("KeyD")
+    ) {
+
+        dx += 220;
+
+    }
+
+
+    if (
+        keys.has("KeyW")
+    ) {
+
+        dy -= 220;
+
+    }
+
+
+    if (
+        keys.has("KeyS")
+    ) {
+
+        dy += 220;
+
+    }
+
+
+
+    const d =
+        Math.hypot(
+            dx,
+            dy
+        );
+
+
+    const boost =
+        keys.has("Space") &&
+        player.en > 0;
+
+
+
+    if (d) {
+
+        let speed =
+            e.speed *
+            (
+                boost ?
+                1.5 :
+                1
+            );
+
+
+        if (
+            b.kind === "water" &&
+            e.air
+        ) {
+
+            speed *= 0.55;
+
+        }
+
+
+        player.x +=
+            dx / d *
+            speed *
+            dt;
+
+
+        player.y +=
+            dy / d *
+            speed *
+            dt;
+
+
+        player.angle =
+            Math.atan2(
+                dy,
+                dx
+            );
+
+    }
+
+
+
+    player.x =
+        Math.max(
+            0,
+            Math.min(
+                WORLD.w,
+                player.x
+            )
+        );
+
+
+    player.y =
+        Math.max(
+            0,
+            Math.min(
+                WORLD.h,
+                player.y
+            )
+        );
+
+
+
+    /* ЭНЕРГИЯ */
+
+
+    player.en =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                player.en +
+                (
+                    boost ?
+                    -28 :
+                    15
+                ) *
+                dt
+            )
+        );
+
+
+
+    /* ВОЗДУХ */
+
+
+    if (
+        b.kind === "water" &&
+        e.air
+    ) {
+
+        player.air =
+            Math.max(
+                0,
+                player.air -
+                20 * dt
+            );
+
+
+        if (
+            player.air <= 0
+        ) {
+
+            player.hp -=
+                7 * dt;
+
+        }
+
+    } else {
+
+        player.air =
+            Math.min(
+                100,
+                player.air +
+                30 * dt
+            );
+
+    }
+
+
+
+    /* ВОДА */
+
+
+    player.water =
+        Math.max(
+            0,
+            player.water -
+            0.45 * dt
+        );
+
+
+    if (
+        b.kind === "water"
+    ) {
+
+        player.water =
+            Math.min(
+                100,
+                player.water +
+                25 * dt
+            );
+
+    }
+
+
+    if (
+        player.water <= 0
+    ) {
+
+        player.hp -=
+            4 * dt;
+
+    }
+
+
+
+    /* ЕДА */
+
+
+    for (
+        let i =
+            foods.length - 1;
+
+        i >= 0;
+
+        i--
+    ) {
+
+        const f =
+            foods[i];
+
+
+        const distance =
+            Math.hypot(
+                f.x -
+                player.x,
+
+                f.y -
+                player.y
+            );
+
+
+        if (
+            distance <
+            e.r + f.r &&
+
+            f.tier <=
+            e.tier + 1
+        ) {
+
+            player.xp +=
+                f.xp;
+
+
+            foods.splice(
+                i,
+                1
+            );
+
+
+            food();
+
+        }
+
+    }
+
+
+
+    /* СМЕРТЬ */
+
+
+    if (
+        player.hp <= 0
+    ) {
+
+        player.hp = 100;
+
+
+        player.xp =
+            Math.floor(
+                player.xp *
+                0.90
+            );
+
+
+        player.x =
+            1300;
+
+
+        player.y =
+            1700;
+
+    }
+
+
+
+    /* АНТИЧИТ */
+
+
+    if (
+        typeof AntiCheat !==
+        "undefined"
+    ) {
+
+        AntiCheat.clampPlayer(
+            player
+        );
+
+
+        AntiCheat.validateMovement(
+            player,
+            oldX,
+            oldY,
+            dt,
+            e.speed
+        );
+
+
+        AntiCheat.saveSafeXP(
+            player
+        );
+
+    }
+
+
+
+    /* СОХРАНЕНИЕ АККАУНТА */
+
+
+    Accounts.saveProgress(
+
+        player.xp,
+
+        player.nickname
+
+    );
+
+
+
+    cam.x +=
+
+        (
+            player.x -
+            cam.x
+        ) *
+
+        Math.min(
+            1,
+            dt * 6
+        );
+
+
+    cam.y +=
+
+        (
+            player.y -
+            cam.y
+        ) *
+
+        Math.min(
+            1,
+            dt * 6
+        );
+
+}
+
+
+
+function sc(x, y) {
+
+    return [
+
+        x -
+        cam.x +
+        c.width / 2,
+
+        y -
+        cam.y +
+        c.height / 2
+
+    ];
+
+}
+
+
+
+function draw() {
+
+    g.fillStyle =
+        "#78c8e6";
+
+
+    g.fillRect(
+        0,
+        0,
+        c.width,
+        c.height
+    );
+
+
+
+    for (
+        const b of BIOMES
+    ) {
+
+        const p =
+            sc(
+                b.x,
+                b.y
+            );
+
+
+        g.fillStyle =
+            b.color;
+
+
+        g.fillRect(
+            p[0],
+            p[1],
+            b.w,
+            b.h
+        );
+
+    }
+
+
+
+    for (
+        const f of foods
+    ) {
+
+        const p =
+            sc(
+                f.x,
+                f.y
+            );
+
+
+        const hue =
+            (
+                f.tier * 31
+            ) %
+            360;
+
+
+        g.fillStyle =
+            `hsl(${hue} 85% 62%)`;
+
+
+        g.beginPath();
+
+
+        g.arc(
+            p[0],
+            p[1],
+            f.r,
+            0,
+            Math.PI * 2
+        );
+
+
+        g.fill();
+
+    }
+
+
+
+    const e =
+        evo();
+
+
+    const p =
+        sc(
+            player.x,
+            player.y
+        );
+
+
+    const im =
+        imgs[
+            e.sprite
+        ];
+
+
+
+    g.save();
+
+
+    g.translate(
+        p[0],
+        p[1]
+    );
+
+
+    g.rotate(
+        player.angle
+    );
+
+
+
+    if (
+        im &&
+        im.complete
+    ) {
+
+        g.drawImage(
+
+            im,
+
+            -e.r * 1.45,
+
+            -e.r,
+
+            e.r * 2.9,
+
+            e.r * 2
+
+        );
+
+    } else {
+
+        g.fillStyle =
+            "#ffffff";
+
+
+        g.beginPath();
+
+
+        g.arc(
+            0,
+            0,
+            e.r,
+            0,
+            Math.PI * 2
+        );
+
+
+        g.fill();
+
+    }
+
+
+    g.restore();
+
+
+
+    const level =
+        e.level;
+
+
+    const next =
+        EVOLUTIONS[
+            Math.min(
+                level,
+                EVOLUTIONS.length - 1
+            )
+        ];
+
+
+
+    const pct =
+        level >= 45 ?
+
+        100 :
+
+        (
+            player.xp -
+            e.xp
+        ) /
+
+        (
+            next.xp -
+            e.xp
+        ) *
+
+        100;
+
+
+
+    document.querySelector(
+        "#formName"
+    ).textContent =
+
+        player.nickname +
+
+        " | Уровень " +
+
+        level +
+
+        "/45 | " +
+
+        e.name +
+
+        " | " +
+
+        Math.floor(
+            player.xp
+        ) +
+
+        " XP";
+
+
+
+    document.querySelector(
+        "#hp"
+    ).style.width =
+
+        Math.max(
+            0,
+            player.hp
+        ) + "%";
+
+
+
+    document.querySelector(
+        "#energy"
+    ).style.width =
+
+        player.en + "%";
+
+
+
+    document.querySelector(
+        "#air"
+    ).style.width =
+
+        player.air + "%";
+
+
+
+    const water =
+        document.querySelector(
+            "#water"
+        );
+
+
+    if (water) {
+
+        water.style.width =
+            player.water +
+            "%";
+
+    }
+
+
+
+    const xp =
+        document.querySelector(
+            "#xp"
+        );
+
+
+    if (xp) {
+
+        xp.style.width =
+
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    pct
+                )
+            ) +
+
+            "%";
+
+    }
+
+
+
+    document.querySelector(
+        "#biome"
+    ).textContent =
+
+        biome(
+            player.x,
+            player.y
+        ).name;
+
+
+
+    drawMini();
+
+}
+
+
+
+function drawMini() {
+
+    mg.clearRect(
+        0,
+        0,
+        180,
+        110
+    );
+
+
+    const sx =
+        180 /
+        WORLD.w;
+
+
+    const sy =
+        110 /
+        WORLD.h;
+
+
+
+    for (
+        const b of BIOMES
+    ) {
+
+        mg.fillStyle =
+            b.color;
+
+
+        mg.fillRect(
+
+            b.x * sx,
+
+            b.y * sy,
+
+            b.w * sx,
+
+            b.h * sy
+
+        );
+
+    }
+
+
+
+    mg.fillStyle =
+        "#ffffff";
+
+
+    mg.beginPath();
+
+
+    mg.arc(
+
+        player.x * sx,
+
+        player.y * sy,
+
+        3,
+
+        0,
+
+        Math.PI * 2
+
+    );
+
+
+    mg.fill();
+
+}
+
+
+
+function loop(t) {
+
+    if (!running) {
+
+        return;
+
+    }
+
+
+    const dt =
+        Math.min(
+
+            0.05,
+
+            (
+                t -
+                last
+            ) /
+
+            1000
+
+        );
+
+
+    last = t;
+
+
+    update(dt);
+
+
+    draw();
+
+
+    requestAnimationFrame(
+        loop
+    );
+
 }
