@@ -11,640 +11,834 @@
 
 <body>
 
-    <!-- ИГРОВОЙ ФОН -->
-    <canvas id="game"></canvas>
+<!-- ИГРА -->
+<canvas id="game"></canvas>
 
 
-    <!-- =========================
-         ЭКРАН АВТОРИЗАЦИИ
-    ========================== -->
+<!-- =========================
+     ЭКРАН ВХОДА
+========================= -->
 
-    <div id="authScreen" class="auth-screen">
+<div id="authScreen" class="auth-screen">
 
-        <div class="auth-card">
+    <div class="auth-card">
 
-            <div class="auth-logo">
-                Skywild<br>
-                <span>Evolution</span>
-            </div>
-
-            <p class="auth-text">
-                Войди в мир эволюции
-            </p>
-
-            <input
-                id="authLogin"
-                type="text"
-                placeholder="Логин"
-                maxlength="16"
-            >
-
-            <input
-                id="authPassword"
-                type="password"
-                placeholder="Пароль"
-                maxlength="32"
-            >
-
-            <button id="loginBtn" class="auth-button">
-                ВОЙТИ
-            </button>
-
-            <button id="registerBtn" class="auth-button secondary">
-                СОЗДАТЬ АККАУНТ
-            </button>
-
-            <p id="authMessage"></p>
-
+        <div class="auth-logo">
+            SKYWILD
+            <span>EVOLUTION</span>
         </div>
+
+        <p class="auth-subtitle">
+            Эволюционируй. Исследуй. Выживай.
+        </p>
+
+        <input
+            id="authLogin"
+            type="text"
+            placeholder="Логин"
+            maxlength="16"
+            autocomplete="username"
+        >
+
+        <input
+            id="authPassword"
+            type="password"
+            placeholder="Пароль"
+            maxlength="32"
+            autocomplete="current-password"
+        >
+
+        <button id="loginBtn" class="auth-button">
+            ВОЙТИ В ИГРУ
+        </button>
+
+        <button id="registerBtn" class="auth-button secondary">
+            СОЗДАТЬ АККАУНТ
+        </button>
+
+        <p id="authMessage"></p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     ГЛАВНОЕ МЕНЮ
+========================= -->
+
+<div id="menu" class="game-menu hidden">
+
+
+    <!-- ДЕКОРАТИВНЫЙ ФОН -->
+
+    <div class="menu-background">
+
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+
+        <div class="mountain mountain-1"></div>
+        <div class="mountain mountain-2"></div>
+
+        <div class="forest"></div>
 
     </div>
 
 
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
 
-    <!-- =========================
-         ГЛАВНОЕ МЕНЮ
-    ========================== -->
+    <header class="top-bar">
 
-    <div id="menu" class="game-menu hidden">
+        <div class="logo-box">
 
-
-        <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
-
-        <div class="top-bar">
-
-            <div class="menu-logo">
-                <span>Skywild</span>
-                Evolution
+            <div class="logo-main">
+                SKYWILD
             </div>
 
+            <div class="logo-sub">
+                EVOLUTION
+            </div>
 
-            <div class="player-box">
+        </div>
 
-                <div class="player-name">
-                    <span id="accountInfo">
-                        Игрок
-                    </span>
+
+        <div class="top-player">
+
+            <div class="avatar">
+                🐦
+            </div>
+
+            <div class="account-data">
+
+                <div class="account-label">
+                    ИГРОК
                 </div>
 
-                <div class="server-select">
-
-                    <span>🇷🇺</span>
-
-                    <select id="server">
-                        <option>Europe 1</option>
-                        <option>Europe 2</option>
-                        <option>Asia 1</option>
-                    </select>
-
+                <div id="accountInfo" class="account-name">
+                    Игрок
                 </div>
-
-                <button
-                    id="play"
-                    class="play-button"
-                >
-                    ИГРАТЬ
-                </button>
 
             </div>
 
         </div>
 
 
+        <div class="server-box">
 
-        <!-- ЛЕВАЯ ПАНЕЛЬ ЭВОЛЮЦИЙ -->
+            <span class="server-dot"></span>
 
-        <aside class="evolution-panel">
+            <select id="server">
 
-            <div class="evolution-card active">
+                <option>Europe</option>
+                <option>Asia</option>
+                <option>America</option>
 
-                <div class="evolution-image">
-                    🐟
-                </div>
+            </select>
 
-                <div class="evolution-info">
+        </div>
 
-                    <div class="evolution-title">
-                        Начальная форма
-                    </div>
+    </header>
 
-                    <div class="evolution-progress">
-                        <div style="width: 100%"></div>
-                    </div>
 
-                    <small>
-                        Уровень 1
-                    </small>
+    <!-- ЛЕВАЯ КАРТОЧКА ИГРОКА -->
 
-                </div>
+    <aside class="player-panel">
+
+        <div class="panel-title">
+            ТВОЯ ЭВОЛЮЦИЯ
+        </div>
+
+
+        <div class="player-creature">
+
+            <div class="creature-glow"></div>
+
+            <div class="creature-icon">
+                🦅
+            </div>
+
+        </div>
+
+
+        <div class="current-evolution">
+
+            <div class="evolution-label">
+                ТЕКУЩАЯ ФОРМА
+            </div>
+
+            <div class="evolution-name">
+                НОВАЯ ЭВОЛЮЦИЯ
+            </div>
+
+            <div class="level-text">
+                УРОВЕНЬ 1 / 45
+            </div>
+
+        </div>
+
+
+        <div class="menu-xp">
+
+            <div class="menu-xp-top">
+
+                <span>XP</span>
+
+                <span id="menuXpText">
+                    0 XP
+                </span>
 
             </div>
 
+            <div class="menu-xp-bar">
 
-            <div class="evolution-card">
-
-                <div class="evolution-image">
-                    🐦
-                </div>
-
-                <div class="evolution-info">
-
-                    <div class="evolution-title">
-                        Следующая эволюция
-                    </div>
-
-                    <div class="evolution-progress">
-
-                        <div style="width: 35%"></div>
-
-                    </div>
-
-                    <small>
-                        Собирай XP
-                    </small>
-
-                </div>
+                <div id="menuXpFill"></div>
 
             </div>
 
+        </div>
 
-            <div class="evolution-card">
+    </aside>
 
-                <div class="evolution-image">
-                    🦅
-                </div>
 
-                <div class="evolution-info">
+    <!-- ЦЕНТРАЛЬНАЯ ЧАСТЬ -->
 
-                    <div class="evolution-title">
-                        Высшая форма
-                    </div>
+    <main class="main-menu">
 
-                    <div class="evolution-progress">
 
-                        <div style="width: 5%"></div>
+        <section class="welcome-panel">
 
-                    </div>
-
-                    <small>
-                        Достигни высокого уровня
-                    </small>
-
-                </div>
-
+            <div class="welcome-decoration">
+                🪽
             </div>
 
+            <h1>
+                ДОБРО ПОЖАЛОВАТЬ
+            </h1>
 
-            <div class="evolution-card locked">
+            <p>
+                Исследуй огромный мир, собирай еду
+                и развивай своего персонажа.
+            </p>
 
-                <div class="evolution-image">
-                    🔒
-                </div>
+            <p class="welcome-small">
+                Тебя ждут 45 уровней эволюции.
+            </p>
 
-                <div class="evolution-info">
+        </section>
 
-                    <div class="evolution-title">
-                        Секретная эволюция
-                    </div>
 
-                    <small>
-                        Откроется позже
-                    </small>
+        <!-- БОЛЬШАЯ КНОПКА ИГРАТЬ -->
 
-                </div>
+        <button id="play" class="big-play">
 
-            </div>
-
-        </aside>
-
-
-
-        <!-- ЦЕНТРАЛЬНОЕ ОКНО -->
-
-        <main class="main-panel">
-
-
-            <div class="main-tabs">
-
-                <button
-                    class="tab active"
-                    data-tab="how"
-                >
-                    КАК ИГРАТЬ?
-                </button>
-
-                <button
-                    class="tab"
-                    data-tab="evolution"
-                >
-                    ЭВОЛЮЦИИ
-                </button>
-
-                <button
-                    class="tab"
-                    data-tab="world"
-                >
-                    МИР
-                </button>
-
-            </div>
-
-
-
-            <!-- КАК ИГРАТЬ -->
-
-            <div
-                id="how"
-                class="tab-content active"
-            >
-
-                <h1>
-                    КАК ИГРАТЬ?
-                </h1>
-
-                <p>
-                    Собирай еду, получай опыт и развивайся.
-                </p>
-
-                <p>
-                    Каждая эволюция открывает новые возможности.
-                </p>
-
-
-                <div class="how-grid">
-
-                    <div class="how-item">
-
-                        <div class="how-icon">
-                            🖱️
-                        </div>
-
-                        <h3>
-                            ДВИЖЕНИЕ
-                        </h3>
-
-                        <p>
-                            Зажми левую кнопку мыши,
-                            чтобы двигаться.
-                        </p>
-
-                    </div>
-
-
-                    <div class="how-item">
-
-                        <div class="how-icon">
-                            🍎
-                        </div>
-
-                        <h3>
-                            СОБИРАЙ ЕДУ
-                        </h3>
-
-                        <p>
-                            Еда даёт XP для новых уровней.
-                        </p>
-
-                    </div>
-
-
-                    <div class="how-item">
-
-                        <div class="how-icon">
-                            💧
-                        </div>
-
-                        <h3>
-                            СЛЕДИ ЗА ВОДОЙ
-                        </h3>
-
-                        <p>
-                            Вода постепенно заканчивается.
-                        </p>
-
-                    </div>
-
-
-                    <div class="how-item">
-
-                        <div class="how-icon">
-                            🧬
-                        </div>
-
-                        <h3>
-                            ЭВОЛЮЦИЯ
-                        </h3>
-
-                        <p>
-                            Достигни 45 уровня.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- ЭВОЛЮЦИИ -->
-
-            <div
-                id="evolution"
-                class="tab-content"
-            >
-
-                <h1>
-                    ТВОЯ ЭВОЛЮЦИЯ
-                </h1>
-
-                <p>
-                    В игре доступно 45 уровней.
-                </p>
-
-                <div class="level-preview">
-
-                    <div class="level-circle">
-                        1
-                    </div>
-
-                    <div class="level-line"></div>
-
-                    <div class="level-circle">
-                        15
-                    </div>
-
-                    <div class="level-line"></div>
-
-                    <div class="level-circle">
-                        30
-                    </div>
-
-                    <div class="level-line"></div>
-
-                    <div class="level-circle final">
-                        45
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- МИР -->
-
-            <div
-                id="world"
-                class="tab-content"
-            >
-
-                <h1>
-                    МИР SKYWILD
-                </h1>
-
-                <p>
-                    Исследуй разные территории.
-                </p>
-
-                <div class="world-list">
-
-                    <div>🌲 Лес</div>
-
-                    <div>💧 Озеро</div>
-
-                    <div>🏔️ Горы</div>
-
-                    <div>🌋 Опасная зона</div>
-
-                </div>
-
-            </div>
-
-
-        </main>
-
-
-
-        <!-- ПРАВОЕ МЕНЮ -->
-
-        <aside class="right-menu">
-
-            <button class="menu-square">
-                🗺️
-                <span>КАРТА</span>
-            </button>
-
-            <button class="menu-square">
-                🧬
-                <span>ЭВОЛЮЦИИ</span>
-            </button>
-
-            <button class="menu-square">
-                🏆
-                <span>РЕКОРДЫ</span>
-            </button>
-
-            <button
-                id="logoutBtn"
-                class="menu-square danger"
-            >
-                🚪
-                <span>ВЫЙТИ</span>
-            </button>
-
-        </aside>
-
-
-
-        <!-- НИЖНЯЯ ПАНЕЛЬ -->
-
-        <div class="bottom-bar">
+            <span class="play-icon">
+                ▶
+            </span>
 
             <span>
-                © Skywild Evolution
+
+                ИГРАТЬ
+
+                <small>
+                    НАЧАТЬ ПРИКЛЮЧЕНИЕ
+                </small>
+
+            </span>
+
+        </button>
+
+
+        <!-- КАРТОЧКИ -->
+
+        <div class="menu-cards">
+
+
+            <button
+                class="menu-card"
+                id="howToPlayBtn"
+            >
+
+                <span class="card-icon">
+                    ❓
+                </span>
+
+                <span>
+
+                    КАК ИГРАТЬ?
+
+                    <small>
+                        Узнай основы игры
+                    </small>
+
+                </span>
+
+            </button>
+
+
+            <button
+                class="menu-card"
+                id="evolutionBtn"
+            >
+
+                <span class="card-icon">
+                    🧬
+                </span>
+
+                <span>
+
+                    ЭВОЛЮЦИИ
+
+                    <small>
+                        45 уровней развития
+                    </small>
+
+                </span>
+
+            </button>
+
+
+            <button
+                class="menu-card"
+                id="worldBtn"
+            >
+
+                <span class="card-icon">
+                    🌍
+                </span>
+
+                <span>
+
+                    КАРТА МИРА
+
+                    <small>
+                        Исследуй биомы
+                    </small>
+
+                </span>
+
+            </button>
+
+
+            <button
+                class="menu-card"
+                id="settingsBtn"
+            >
+
+                <span class="card-icon">
+                    ⚙️
+                </span>
+
+                <span>
+
+                    НАСТРОЙКИ
+
+                    <small>
+                        Настрой игру
+                    </small>
+
+                </span>
+
+            </button>
+
+        </div>
+
+    </main>
+
+
+    <!-- ПРАВАЯ ПАНЕЛЬ -->
+
+    <aside class="right-panel">
+
+        <div class="side-title">
+            ИНФОРМАЦИЯ
+        </div>
+
+
+        <div class="info-card">
+
+            <span class="info-icon">
+                🏆
             </span>
 
             <div>
 
-                <button>
-                    ⚙️ Настройки
-                </button>
+                <b>
+                    45 УРОВНЕЙ
+                </b>
 
-                <button>
-                    ❓ Помощь
-                </button>
+                <small>
+                    Достигни вершины эволюции
+                </small>
 
             </div>
 
         </div>
 
 
-    </div>
+        <div class="info-card">
 
-
-
-    <!-- =========================
-         HUD ИГРЫ
-    ========================== -->
-
-    <div id="hud" class="hidden">
-
-        <div class="panel">
-
-            <b id="formName">
-                Уровень 1
-            </b>
-
-
-            <div class="row">
-
-                ❤️
-
-                <div class="bar">
-
-                    <i id="hp"></i>
-
-                </div>
-
-            </div>
-
-
-            <div class="row">
-
-                ⚡
-
-                <div class="bar energy">
-
-                    <i id="energy"></i>
-
-                </div>
-
-            </div>
-
-
-            <div class="row">
-
-                🫧
-
-                <div class="bar air">
-
-                    <i id="air"></i>
-
-                </div>
-
-            </div>
-
-
-            <div class="row">
-
+            <span class="info-icon">
                 💧
+            </span>
 
-                <div class="bar water">
+            <div>
 
-                    <i id="water"></i>
+                <b>
+                    ВЫЖИВАНИЕ
+                </b>
 
-                </div>
-
-            </div>
-
-
-            <div class="row">
-
-                ⭐
-
-                <div class="bar xp">
-
-                    <i id="xp"></i>
-
-                </div>
+                <small>
+                    Следи за водой и здоровьем
+                </small>
 
             </div>
-
-            <div id="info"></div>
 
         </div>
 
 
-        <div class="help">
+        <div class="info-card">
 
-            🖱️ ЛКМ — движение<br>
-            ⌨️ WASD — движение<br>
-            ⚡ SPACE — ускорение
+            <span class="info-icon">
+                🍎
+            </span>
+
+            <div>
+
+                <b>
+                    СОБИРАЙ XP
+                </b>
+
+                <small>
+                    Ешь еду и становись сильнее
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="tips">
+
+            <div class="tips-title">
+                СОВЕТ
+            </div>
+
+            <p id="tipText">
+                Собирай еду, чтобы быстрее
+                получать новые уровни.
+            </p>
+
+        </div>
+
+    </aside>
+
+
+    <!-- НИЖНЯЯ ПАНЕЛЬ -->
+
+    <footer class="bottom-bar">
+
+        <div>
+            SKYWILD EVOLUTION
+            <span>•</span>
+            45 УРОВНЕЙ
+        </div>
+
+
+        <div class="bottom-buttons">
+
+            <button id="logoutBtn">
+                🚪 ВЫЙТИ
+            </button>
+
+        </div>
+
+    </footer>
+
+
+    <!-- МОДАЛЬНОЕ ОКНО -->
+
+    <div id="menuModal" class="modal hidden">
+
+        <div class="modal-box">
+
+            <button
+                id="closeModal"
+                class="close-modal"
+            >
+                ×
+            </button>
+
+            <div id="modalContent">
+
+                <h2>
+                    КАК ИГРАТЬ?
+                </h2>
+
+                <div class="modal-grid">
+
+                    <div>
+                        <span>🖱️</span>
+                        <b>ДВИГАЙСЯ</b>
+                        <p>
+                            Используй мышь или WASD.
+                        </p>
+                    </div>
+
+                    <div>
+                        <span>🍎</span>
+                        <b>СОБИРАЙ ЕДУ</b>
+                        <p>
+                            Еда даёт XP.
+                        </p>
+                    </div>
+
+                    <div>
+                        <span>💧</span>
+                        <b>ПЕЙ ВОДУ</b>
+                        <p>
+                            Вода постепенно заканчивается.
+                        </p>
+                    </div>
+
+                    <div>
+                        <span>🧬</span>
+                        <b>ЭВОЛЮЦИОНИРУЙ</b>
+                        <p>
+                            Достигни 45 уровня.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
 
 
+</div>
 
-    <!-- МИНИКАРТА -->
 
-    <div
-        id="minimapBox"
-        class="hidden"
-    >
+<!-- =========================
+     HUD ИГРЫ
+========================= -->
 
-        <canvas
-            id="minimap"
-            width="180"
-            height="110"
-        ></canvas>
+<div id="hud" class="hidden">
 
-        <div id="biome"></div>
+    <div class="panel">
+
+        <b id="formName">
+            Уровень 1
+        </b>
+
+
+        <div class="row">
+
+            ❤️
+
+            <div class="bar">
+                <i id="hp"></i>
+            </div>
+
+        </div>
+
+
+        <div class="row">
+
+            ⚡
+
+            <div class="bar energy">
+                <i id="energy"></i>
+            </div>
+
+        </div>
+
+
+        <div class="row">
+
+            🫧
+
+            <div class="bar air">
+                <i id="air"></i>
+            </div>
+
+        </div>
+
+
+        <div class="row">
+
+            💧
+
+            <div class="bar water">
+                <i id="water"></i>
+            </div>
+
+        </div>
+
+
+        <div class="row">
+
+            ⭐
+
+            <div class="bar xp">
+                <i id="xp"></i>
+            </div>
+
+        </div>
+
+        <div id="info"></div>
 
     </div>
 
 
+    <div class="help">
 
-    <!-- СКРИПТЫ -->
+        🖱️ ЛКМ — движение<br>
+        ⌨️ WASD — движение<br>
+        ⚡ SPACE — ускорение
 
-    <script src="js/data.js"></script>
+    </div>
 
-    <script src="js/accounts.js"></script>
-
-    <script src="js/anticheat.js"></script>
-
-    <script src="js/game.js"></script>
-
-
-    <script>
-
-        document
-            .querySelectorAll(".tab")
-            .forEach(button => {
-
-                button.onclick = () => {
-
-                    document
-                        .querySelectorAll(".tab")
-                        .forEach(x =>
-                            x.classList.remove("active")
-                        );
+</div>
 
 
-                    document
-                        .querySelectorAll(".tab-content")
-                        .forEach(x =>
-                            x.classList.remove("active")
-                        );
+<!-- МИНИКАРТА -->
+
+<div
+    id="minimapBox"
+    class="hidden"
+>
+
+    <canvas
+        id="minimap"
+        width="180"
+        height="110"
+    ></canvas>
+
+    <div id="biome"></div>
+
+</div>
 
 
-                    button.classList.add("active");
+<!-- СКРИПТЫ -->
+
+<script src="js/data.js"></script>
+<script src="js/accounts.js"></script>
+<script src="js/anticheat.js"></script>
+<script src="js/game.js"></script>
 
 
-                    document
-                        .querySelector(
-                            "#" +
-                            button.dataset.tab
-                        )
-                        .classList.add("active");
+<!-- МЕНЮ -->
 
-                };
+<script>
 
-            });
+const menuModal =
+    document.querySelector("#menuModal");
 
-    </script>
+const modalContent =
+    document.querySelector("#modalContent");
+
+
+function openModal(title, content) {
+
+    modalContent.innerHTML = `
+
+        <h2>${title}</h2>
+
+        ${content}
+
+    `;
+
+    menuModal.classList.remove("hidden");
+
+}
+
+
+document
+    .querySelector("#closeModal")
+    .onclick = () => {
+
+        menuModal.classList.add("hidden");
+
+    };
+
+
+document
+    .querySelector("#howToPlayBtn")
+    .onclick = () => {
+
+        openModal(
+
+            "КАК ИГРАТЬ?",
+
+            `
+            <div class="modal-grid">
+
+                <div>
+                    <span>🖱️</span>
+                    <b>ДВИЖЕНИЕ</b>
+                    <p>Используй мышь или WASD.</p>
+                </div>
+
+                <div>
+                    <span>🍎</span>
+                    <b>XP</b>
+                    <p>Собирай еду.</p>
+                </div>
+
+                <div>
+                    <span>💧</span>
+                    <b>ВОДА</b>
+                    <p>Следи за запасом воды.</p>
+                </div>
+
+                <div>
+                    <span>🧬</span>
+                    <b>ЭВОЛЮЦИЯ</b>
+                    <p>Развивайся до 45 уровня.</p>
+                </div>
+
+            </div>
+            `
+
+        );
+
+    };
+
+
+document
+    .querySelector("#evolutionBtn")
+    .onclick = () => {
+
+        openModal(
+
+            "ЭВОЛЮЦИИ",
+
+            `
+            <div class="evolution-modal">
+
+                <div class="evo-number">1</div>
+                <div class="evo-line"></div>
+                <div class="evo-number">10</div>
+                <div class="evo-line"></div>
+                <div class="evo-number">20</div>
+                <div class="evo-line"></div>
+                <div class="evo-number">30</div>
+                <div class="evo-line"></div>
+                <div class="evo-number final">45</div>
+
+            </div>
+
+            <p>
+                Собирай XP и открывай новые формы.
+            </p>
+            `
+
+        );
+
+    };
+
+
+document
+    .querySelector("#worldBtn")
+    .onclick = () => {
+
+        openModal(
+
+            "КАРТА МИРА",
+
+            `
+            <div class="world-modal">
+
+                <div>🌲 Зелёные земли</div>
+                <div>🌳 Северный лес</div>
+                <div>🌊 Большой океан</div>
+                <div>🏜️ Пустыня</div>
+                <div>🏔️ Кристальные горы</div>
+                <div>🐊 Болота</div>
+                <div>❄️ Ледяной край</div>
+
+            </div>
+            `
+
+        );
+
+    };
+
+
+document
+    .querySelector("#settingsBtn")
+    .onclick = () => {
+
+        openModal(
+
+            "НАСТРОЙКИ",
+
+            `
+            <div class="settings-modal">
+
+                <p>
+                    Управление:
+                    мышь или WASD
+                </p>
+
+                <p>
+                    Ускорение:
+                    SPACE
+                </p>
+
+                <p>
+                    Прогресс автоматически
+                    сохраняется в аккаунте.
+                </p>
+
+            </div>
+            `
+
+        );
+
+    };
+
+
+const tips = [
+
+    "Собирай еду, чтобы быстрее получать новые уровни.",
+
+    "Вода постепенно заканчивается — ищи водоёмы.",
+
+    "На высоких уровнях нужно значительно больше XP.",
+
+    "Используй SPACE для ускорения.",
+
+    "Каждая новая эволюция меняет размер и скорость."
+
+];
+
+
+let tipIndex = 0;
+
+
+setInterval(() => {
+
+    tipIndex =
+        (tipIndex + 1) %
+        tips.length;
+
+    const tip =
+        document.querySelector("#tipText");
+
+    if (tip) {
+
+        tip.textContent =
+            tips[tipIndex];
+
+    }
+
+}, 5000);
+
+</script>
 
 </body>
 </html>
