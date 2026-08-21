@@ -1,14 +1,18 @@
+const OWNER_LOGIN = "MaxPro official";
+const OWNER_XP = 5285000;
+
 const Accounts = {
 
     current: null,
-
 
     getAll() {
 
         try {
 
             return JSON.parse(
-                localStorage.getItem("skywildAccounts")
+                localStorage.getItem(
+                    "skywildAccounts"
+                )
             ) || {};
 
         } catch {
@@ -19,64 +23,77 @@ const Accounts = {
 
     },
 
-
     saveAll(accounts) {
 
         localStorage.setItem(
+
             "skywildAccounts",
+
             JSON.stringify(accounts)
+
         );
 
     },
 
-
     register(login, password) {
 
-        const accounts = this.getAll();
+        const accounts =
+            this.getAll();
 
-        login = login.trim();
-        password = password.trim();
-
+        login =
+            login.trim();
 
         if (!login) {
 
             return {
+
                 ok: false,
-                message: "Введите логин"
+
+                message:
+                    "Введите логин"
+
             };
 
         }
-
 
         if (login.length < 3) {
 
             return {
+
                 ok: false,
-                message: "Логин минимум 3 символа"
+
+                message:
+                    "Логин минимум 3 символа"
+
             };
 
         }
-
 
         if (password.length < 3) {
 
             return {
+
                 ok: false,
-                message: "Пароль минимум 3 символа"
+
+                message:
+                    "Пароль минимум 3 символа"
+
             };
 
         }
-
 
         if (accounts[login]) {
 
             return {
+
                 ok: false,
-                message: "Такой аккаунт уже существует"
+
+                message:
+                    "Такой аккаунт уже существует"
+
             };
 
         }
-
 
         accounts[login] = {
 
@@ -88,83 +105,141 @@ const Accounts = {
 
             level: 1,
 
+            role: "PLAYER",
+
             created: Date.now()
 
         };
 
+        if (
+            login === OWNER_LOGIN
+        ) {
+
+            accounts[login].xp =
+                OWNER_XP;
+
+            accounts[login].level =
+                45;
+
+            accounts[login].role =
+                "OWNER";
+
+        }
 
         this.saveAll(accounts);
 
-
-        this.current = login;
-
+        this.current =
+            login;
 
         localStorage.setItem(
+
             "skywildCurrentAccount",
+
             login
+
         );
 
-
         return {
+
             ok: true,
-            message: "Аккаунт создан"
+
+            message:
+                login === OWNER_LOGIN
+
+                    ? "👑 OWNER аккаунт создан!"
+
+                    : "Аккаунт создан"
+
         };
 
     },
 
-
     login(login, password) {
 
-        const accounts = this.getAll();
+        const accounts =
+            this.getAll();
 
-        login = login.trim();
-
+        login =
+            login.trim();
 
         if (!accounts[login]) {
 
             return {
+
                 ok: false,
-                message: "Аккаунт не найден"
+
+                message:
+                    "Аккаунт не найден"
+
             };
 
         }
 
-
         if (
-            accounts[login].password !== password
+            accounts[login].password !==
+            password
         ) {
 
             return {
+
                 ok: false,
-                message: "Неверный пароль"
+
+                message:
+                    "Неверный пароль"
+
             };
 
         }
 
+        if (
+            login === OWNER_LOGIN
+        ) {
 
-        this.current = login;
+            accounts[login].xp =
+                OWNER_XP;
 
+            accounts[login].level =
+                45;
+
+            accounts[login].role =
+                "OWNER";
+
+            this.saveAll(accounts);
+
+        }
+
+        this.current =
+            login;
 
         localStorage.setItem(
+
             "skywildCurrentAccount",
+
             login
+
         );
 
-
         return {
+
             ok: true,
-            message: "Вход выполнен"
+
+            message:
+                login === OWNER_LOGIN
+
+                    ? "👑 Добро пожаловать, OWNER!"
+
+                    : "Вход выполнен"
+
         };
 
     },
 
-
     autoLogin() {
 
-        const login = localStorage.getItem(
-            "skywildCurrentAccount"
-        );
-
+        const login =
+            localStorage.getItem(
+                "skywildCurrentAccount"
+            );
 
         if (!login) {
 
@@ -172,9 +247,8 @@ const Accounts = {
 
         }
 
-
-        const accounts = this.getAll();
-
+        const accounts =
+            this.getAll();
 
         if (!accounts[login]) {
 
@@ -182,14 +256,29 @@ const Accounts = {
 
         }
 
+        if (
+            login === OWNER_LOGIN
+        ) {
 
-        this.current = login;
+            accounts[login].xp =
+                OWNER_XP;
 
+            accounts[login].level =
+                45;
+
+            accounts[login].role =
+                "OWNER";
+
+            this.saveAll(accounts);
+
+        }
+
+        this.current =
+            login;
 
         return true;
 
     },
-
 
     getAccount() {
 
@@ -199,51 +288,46 @@ const Accounts = {
 
         }
 
+        const accounts =
+            this.getAll();
 
-        const accounts = this.getAll();
+        const account =
+            accounts[this.current];
 
+        if (!account) {
 
-        return accounts[this.current] || null;
+            return null;
 
-    },
-
-
-    getLevelFromXP(xp) {
-
-        let level = 1;
-
+        }
 
         if (
-            typeof EVOLUTIONS === "undefined"
+            this.current === OWNER_LOGIN
         ) {
 
-            return level;
+            account.xp =
+                OWNER_XP;
+
+            account.level =
+                45;
+
+            account.role =
+                "OWNER";
+
+            accounts[this.current] =
+                account;
+
+            this.saveAll(accounts);
 
         }
 
-
-        for (const evolution of EVOLUTIONS) {
-
-            if (
-                xp >= evolution.xp
-            ) {
-
-                level = evolution.level;
-
-            }
-
-        }
-
-
-        return Math.min(
-            45,
-            level
-        );
+        return account;
 
     },
 
-
-    saveProgress(xp, nickname) {
+    saveProgress(
+        xp,
+        nickname
+    ) {
 
         if (!this.current) {
 
@@ -251,214 +335,82 @@ const Accounts = {
 
         }
 
+        const accounts =
+            this.getAll();
 
-        const accounts = this.getAll();
-
-
-        if (!accounts[this.current]) {
+        if (
+            !accounts[this.current]
+        ) {
 
             return;
 
         }
 
+        accounts[this.current].nickname =
+            nickname;
 
-        accounts[this.current].xp = Math.max(
-            0,
-            Math.floor(xp)
-        );
+        if (
+            this.current === OWNER_LOGIN
+        ) {
 
+            accounts[this.current].xp =
+                OWNER_XP;
 
-        if (nickname) {
+            accounts[this.current].level =
+                45;
 
-            accounts[this.current].nickname =
-                nickname;
+            accounts[this.current].role =
+                "OWNER";
+
+        } else {
+
+            accounts[this.current].xp =
+                Math.max(
+
+                    0,
+
+                    Math.floor(xp)
+
+                );
+
+            let level = 1;
+
+            for (
+                const evolution
+                of EVOLUTIONS
+            ) {
+
+                if (
+                    xp >=
+                    evolution.xp
+                ) {
+
+                    level =
+                        evolution.level;
+
+                }
+
+            }
+
+            accounts[this.current].level =
+                Math.min(
+                    45,
+                    level
+                );
+
+            accounts[this.current].role =
+                "PLAYER";
 
         }
-
-
-        accounts[this.current].level =
-            this.getLevelFromXP(xp);
-
 
         this.saveAll(accounts);
 
-
-        this.updateMenu();
-
     },
-
-
-    updateMenu() {
-
-        const account =
-            this.getAccount();
-
-
-        if (!account) {
-
-            return;
-
-        }
-
-
-        const accountInfo =
-            document.querySelector(
-                "#accountInfo"
-            );
-
-
-        if (accountInfo) {
-
-            accountInfo.textContent =
-                account.nickname;
-
-        }
-
-
-        const levelText =
-            document.querySelector(
-                ".level-text"
-            );
-
-
-        if (levelText) {
-
-            levelText.textContent =
-                `УРОВЕНЬ ${account.level} / 45`;
-
-        }
-
-
-        const menuXpText =
-            document.querySelector(
-                "#menuXpText"
-            );
-
-
-        if (menuXpText) {
-
-            menuXpText.textContent =
-                `${account.xp} XP`;
-
-        }
-
-
-        const menuXpFill =
-            document.querySelector(
-                "#menuXpFill"
-            );
-
-
-        if (menuXpFill) {
-
-            let currentXP = 0;
-            let nextXP = 100;
-
-
-            if (
-                typeof EVOLUTIONS !== "undefined"
-            ) {
-
-                const currentEvolution =
-                    EVOLUTIONS.find(
-                        evolution =>
-                            evolution.level === account.level
-                    );
-
-
-                const nextEvolution =
-                    EVOLUTIONS.find(
-                        evolution =>
-                            evolution.level ===
-                            account.level + 1
-                    );
-
-
-                if (currentEvolution) {
-
-                    currentXP =
-                        currentEvolution.xp;
-
-                }
-
-
-                if (nextEvolution) {
-
-                    nextXP =
-                        nextEvolution.xp;
-
-                }
-
-            }
-
-
-            let percent = 100;
-
-
-            if (
-                account.level < 45
-            ) {
-
-                percent =
-                    (
-                        (account.xp - currentXP) /
-                        (nextXP - currentXP)
-                    ) * 100;
-
-            }
-
-
-            percent = Math.max(
-                0,
-                Math.min(
-                    100,
-                    percent
-                )
-            );
-
-
-            menuXpFill.style.width =
-                `${percent}%`;
-
-        }
-
-
-        const evolutionName =
-            document.querySelector(
-                ".evolution-name"
-            );
-
-
-        if (
-            evolutionName &&
-            typeof EVOLUTIONS !== "undefined"
-        ) {
-
-            const evolution =
-                EVOLUTIONS.find(
-                    item =>
-                        item.level === account.level
-                );
-
-
-            if (evolution) {
-
-                evolutionName.textContent =
-                    evolution.name ||
-                    evolution.title ||
-                    `Эволюция ${account.level}`;
-
-            }
-
-        }
-
-    },
-
 
     logout() {
 
-        this.current = null;
-
+        this.current =
+            null;
 
         localStorage.removeItem(
             "skywildCurrentAccount"
