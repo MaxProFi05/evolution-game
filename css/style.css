@@ -1,1 +1,1198 @@
-*{box-sizing:border-box}html,body{margin:0;overflow:hidden;width:100%;height:100%;font-family:Arial;background:#14212a;color:#fff}canvas{display:block;cursor:crosshair}.overlay{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle,#315b70,#0c1218 70%);z-index:9}.card,.panel{background:#101923e8;border:1px solid #ffffff22;border-radius:18px;padding:22px;box-shadow:0 15px 60px #0008}.card{width:min(390px,90vw);text-align:center}.card h1{color:#ffe37c;margin:0}.card input,.card button{width:100%;padding:13px;border:0;border-radius:9px;margin-top:10px;font-size:16px}.card input{background:#263846;color:#fff}.card button{background:linear-gradient(#ffe47f,#dfa52d);font-weight:bold;cursor:pointer}.small{font-size:11px;opacity:.6}.hidden{display:none!important}#hud{position:fixed;left:14px;top:14px;z-index:3;width:280px}.row{display:flex;align-items:center;gap:7px;margin-top:7px}.bar{height:11px;background:#26313b;border-radius:8px;overflow:hidden;flex:1}.bar i{display:block;height:100%;width:100%;background:#ec4b4b}.energy i{background:#ffd34d}.air i{background:#55cbed}.xp i{background:#a875ff}.help{margin-top:10px;padding:9px;background:#101923d8;border-radius:10px;font-size:11px;line-height:1.5;color:#c9d2da}#minimapBox{position:fixed;right:14px;top:14px;z-index:3;background:#101923e8;padding:8px;border-radius:12px;border:1px solid #ffffff22}#minimap{border:1px solid #ffffff55;border-radius:7px;background:#111}#biome{font-size:12px;margin-top:5px;text-align:center}
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #17262c;
+
+    color: white;
+}
+
+
+/* =========================
+   CANVAS
+========================= */
+
+#game {
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 0;
+}
+
+
+/* =========================
+   СКРЫТИЕ
+========================= */
+
+.hidden {
+    display: none !important;
+}
+
+
+/* =========================
+   АВТОРИЗАЦИЯ
+========================= */
+
+.auth-screen {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 100;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(52, 97, 111, .75),
+            rgba(5, 10, 14, .92)
+        );
+
+}
+
+
+.auth-card {
+
+    width: 390px;
+
+    padding: 35px;
+
+    text-align: center;
+
+    background:
+        rgba(18, 45, 55, .96);
+
+    border: 3px solid #547784;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 20px 80px black;
+
+}
+
+
+.auth-logo {
+
+    font-size: 38px;
+
+    font-weight: 900;
+
+    line-height: .8;
+
+    color: #d5f25c;
+
+    text-shadow:
+        3px 3px 0 #19323b;
+
+}
+
+
+.auth-logo span {
+
+    color: white;
+
+}
+
+
+.auth-text {
+
+    color: #a9c2ca;
+
+    margin-bottom: 25px;
+
+}
+
+
+.auth-card input {
+
+    width: 100%;
+
+    margin: 7px 0;
+
+    padding: 14px;
+
+    border: 2px solid #466a75;
+
+    background: #10252c;
+
+    color: white;
+
+    border-radius: 6px;
+
+    font-size: 16px;
+
+}
+
+
+.auth-button {
+
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 14px;
+
+    border: 2px solid #78972b;
+
+    background:
+        linear-gradient(
+            #b9dc49,
+            #6f9621
+        );
+
+    color: white;
+
+    font-weight: bold;
+
+    font-size: 17px;
+
+    cursor: pointer;
+
+    border-radius: 6px;
+
+}
+
+
+.auth-button:hover {
+
+    filter: brightness(1.15);
+
+}
+
+
+.auth-button.secondary {
+
+    border-color: #52727c;
+
+    background:
+        linear-gradient(
+            #446873,
+            #263f48
+        );
+
+}
+
+
+#authMessage {
+
+    min-height: 20px;
+
+    color: #ffcf6a;
+
+}
+
+
+/* =========================
+   ГЛАВНОЕ МЕНЮ
+========================= */
+
+.game-menu {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 10;
+
+    background:
+        linear-gradient(
+            rgba(0, 0, 0, .10),
+            rgba(0, 0, 0, .35)
+        );
+
+}
+
+
+/* =========================
+   ВЕРХНЯЯ ПАНЕЛЬ
+========================= */
+
+.top-bar {
+
+    position: absolute;
+
+    top: 25px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: min(900px, 62vw);
+
+    height: 75px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    background:
+        linear-gradient(
+            90deg,
+            #263d47,
+            #4d6c76,
+            #263d47
+        );
+
+    border: 3px solid #18282f;
+
+    box-shadow:
+        0 5px 0 rgba(0, 0, 0, .45);
+
+}
+
+
+.menu-logo {
+
+    padding: 10px 25px;
+
+    text-align: center;
+
+    font-size: 26px;
+
+    font-weight: 900;
+
+    color: white;
+
+    line-height: 22px;
+
+}
+
+
+.menu-logo span {
+
+    display: block;
+
+    color: #cce953;
+
+}
+
+
+.player-box {
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+}
+
+
+.player-name {
+
+    padding: 15px;
+
+    min-width: 180px;
+
+    font-weight: bold;
+
+    background: #263b43;
+
+    border-left:
+        2px solid
+        rgba(255,255,255,.1);
+
+}
+
+
+.server-select {
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 0 10px;
+
+    background: #334d56;
+
+}
+
+
+.server-select select {
+
+    background: transparent;
+
+    border: none;
+
+    color: white;
+
+    outline: none;
+
+    font-weight: bold;
+
+}
+
+
+.server-select option {
+
+    background: #263b43;
+
+}
+
+
+.play-button {
+
+    height: 100%;
+
+    min-width: 140px;
+
+    border: none;
+
+    border-left: 3px solid #203038;
+
+    background:
+        linear-gradient(
+            #4f8e93,
+            #2b555d
+        );
+
+    color: white;
+
+    font-size: 20px;
+
+    font-weight: 900;
+
+    cursor: pointer;
+
+}
+
+
+.play-button:hover {
+
+    background:
+        linear-gradient(
+            #67adb0,
+            #367078
+        );
+
+}
+
+
+/* =========================
+   ЛЕВАЯ ПАНЕЛЬ
+========================= */
+
+.evolution-panel {
+
+    position: absolute;
+
+    left: 15px;
+
+    top: 105px;
+
+    width: 245px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+
+.evolution-card {
+
+    min-height: 92px;
+
+    display: flex;
+
+    padding: 8px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #20444d,
+            #102a32
+        );
+
+    border: 3px solid #102027;
+
+    border-radius: 8px;
+
+    box-shadow:
+        4px 4px 0
+        rgba(0,0,0,.35);
+
+}
+
+
+.evolution-card.active {
+
+    border-color: #a2bf47;
+
+}
+
+
+.evolution-card.locked {
+
+    opacity: .7;
+
+}
+
+
+.evolution-image {
+
+    width: 70px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 45px;
+
+}
+
+
+.evolution-info {
+
+    flex: 1;
+
+    padding: 6px;
+
+}
+
+
+.evolution-title {
+
+    font-weight: bold;
+
+    font-size: 14px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.evolution-info small {
+
+    color: #b9d0d4;
+
+}
+
+
+.evolution-progress {
+
+    width: 100%;
+
+    height: 12px;
+
+    margin-bottom: 5px;
+
+    background: #0b1519;
+
+    border:
+        1px solid
+        rgba(255,255,255,.2);
+
+}
+
+
+.evolution-progress div {
+
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #94bd36,
+            #d4ef63
+        );
+
+}
+
+
+/* =========================
+   ЦЕНТРАЛЬНОЕ ОКНО
+========================= */
+
+.main-panel {
+
+    position: absolute;
+
+    top: 205px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: min(620px, 50vw);
+
+    min-height: 390px;
+
+    background:
+        rgba(18, 57, 68, .97);
+
+    border: 3px solid #132b32;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 8px 0
+        rgba(0,0,0,.45);
+
+    overflow: hidden;
+
+}
+
+
+.main-tabs {
+
+    display: flex;
+
+    background: #203b44;
+
+    border-bottom:
+        2px solid
+        #101f24;
+
+}
+
+
+.tab {
+
+    flex: 1;
+
+    padding: 14px 5px;
+
+    border: none;
+
+    border-right:
+        1px solid
+        rgba(255,255,255,.1);
+
+    background: #2b4650;
+
+    color: #b8cbd0;
+
+    font-weight: 900;
+
+    cursor: pointer;
+
+}
+
+
+.tab:hover {
+
+    background: #365965;
+
+}
+
+
+.tab.active {
+
+    color: white;
+
+    background: #54737c;
+
+}
+
+
+.tab-content {
+
+    display: none;
+
+    padding: 25px;
+
+    text-align: center;
+
+}
+
+
+.tab-content.active {
+
+    display: block;
+
+}
+
+
+.tab-content h1 {
+
+    margin-top: 0;
+
+    font-size: 28px;
+
+    text-shadow:
+        3px 3px 0
+        #0c2026;
+
+}
+
+
+.tab-content p {
+
+    color: #d4e1e4;
+
+}
+
+
+/* =========================
+   КАК ИГРАТЬ
+========================= */
+
+.how-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 12px;
+
+    margin-top: 25px;
+
+}
+
+
+.how-item {
+
+    padding: 15px;
+
+    background:
+        rgba(0,0,0,.15);
+
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
+    border-radius: 8px;
+
+}
+
+
+.how-icon {
+
+    font-size: 32px;
+
+}
+
+
+.how-item h3 {
+
+    margin:
+        8px 0 5px;
+
+    font-size: 13px;
+
+}
+
+
+.how-item p {
+
+    margin: 0;
+
+    font-size: 12px;
+
+    color: #a9c0c6;
+
+}
+
+
+/* =========================
+   ЭВОЛЮЦИИ
+========================= */
+
+.level-preview {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-top: 70px;
+
+}
+
+
+.level-circle {
+
+    width: 60px;
+
+    height: 60px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #3f6871;
+
+    border: 4px solid #87aeb4;
+
+    font-weight: 900;
+
+    font-size: 18px;
+
+}
+
+
+.level-circle.final {
+
+    background: #789b26;
+
+    border-color: #d1ed63;
+
+}
+
+
+.level-line {
+
+    width: 70px;
+
+    height: 7px;
+
+    background: #62818a;
+
+}
+
+
+/* =========================
+   МИР
+========================= */
+
+.world-list {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 15px;
+
+    margin-top: 30px;
+
+}
+
+
+.world-list div {
+
+    padding: 25px;
+
+    background: #244952;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+
+}
+
+
+/* =========================
+   ПРАВОЕ МЕНЮ
+========================= */
+
+.right-menu {
+
+    position: absolute;
+
+    right: 15px;
+
+    top: 105px;
+
+    width: 155px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+
+.menu-square {
+
+    height: 85px;
+
+    border: 3px solid #182126;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #456f79,
+            #1e3d46
+        );
+
+    color: white;
+
+    font-size: 28px;
+
+    font-weight: 900;
+
+    cursor: pointer;
+
+    text-shadow:
+        2px 2px 0 black;
+
+}
+
+
+.menu-square span {
+
+    display: block;
+
+    font-size: 13px;
+
+}
+
+
+.menu-square:hover {
+
+    transform: scale(1.04);
+
+    filter: brightness(1.15);
+
+}
+
+
+.menu-square.danger {
+
+    background:
+        linear-gradient(
+            #b94b4b,
+            #642b2b
+        );
+
+}
+
+
+/* =========================
+   НИЖНЯЯ ПАНЕЛЬ
+========================= */
+
+.bottom-bar {
+
+    position: absolute;
+
+    bottom: 0;
+
+    left: 0;
+
+    right: 0;
+
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 20px;
+
+    background:
+        rgba(5, 10, 12, .88);
+
+    border-top:
+        2px solid
+        #1d343b;
+
+    color: #b8c5c8;
+
+    font-size: 12px;
+
+}
+
+
+.bottom-bar button {
+
+    background: none;
+
+    border: none;
+
+    color: #d2e3e6;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================
+   HUD
+========================= */
+
+#hud {
+
+    position: fixed;
+
+    top: 15px;
+
+    left: 15px;
+
+    z-index: 50;
+
+}
+
+
+.panel {
+
+    width: 260px;
+
+    padding: 15px;
+
+    background:
+        rgba(14, 39, 47, .9);
+
+    border: 2px solid #315963;
+
+    border-radius: 8px;
+
+}
+
+
+.row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 9px;
+
+}
+
+
+.bar {
+
+    flex: 1;
+
+    height: 15px;
+
+    overflow: hidden;
+
+    background: #10191d;
+
+    border:
+        1px solid
+        #65818a;
+
+    border-radius: 3px;
+
+}
+
+
+.bar i {
+
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+
+    background: #df5454;
+
+}
+
+
+.energy i {
+
+    background: #e7d356;
+
+}
+
+
+.air i {
+
+    background: #77d6e8;
+
+}
+
+
+.water i {
+
+    background: #479edc;
+
+}
+
+
+.xp i {
+
+    background: #b67cf0;
+
+}
+
+
+.help {
+
+    margin-top: 10px;
+
+    padding: 10px;
+
+    background:
+        rgba(10,25,30,.8);
+
+    border-radius: 6px;
+
+    font-size: 12px;
+
+}
+
+
+/* =========================
+   МИНИКАРТА
+========================= */
+
+#minimapBox {
+
+    position: fixed;
+
+    right: 15px;
+
+    bottom: 55px;
+
+    z-index: 50;
+
+    padding: 8px;
+
+    background:
+        rgba(12, 32, 38, .9);
+
+    border: 2px solid #466b73;
+
+    border-radius: 8px;
+
+}
+
+
+#minimap {
+
+    display: block;
+
+    border:
+        1px solid
+        #7898a0;
+
+}
+
+
+#biome {
+
+    padding-top: 5px;
+
+    text-align: center;
+
+    font-size: 12px;
+
+}
+
+
+/* =========================
+   АДАПТАЦИЯ
+========================= */
+
+@media (max-width: 1000px) {
+
+    .evolution-panel {
+
+        width: 180px;
+
+    }
+
+
+    .right-menu {
+
+        width: 110px;
+
+    }
+
+
+    .main-panel {
+
+        width: 55vw;
+
+    }
+
+
+    .evolution-card {
+
+        min-height: 70px;
+
+    }
+
+
+    .evolution-image {
+
+        width: 50px;
+
+        font-size: 30px;
+
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .evolution-panel,
+    .right-menu {
+
+        display: none;
+
+    }
+
+
+    .main-panel {
+
+        width: 90vw;
+
+    }
+
+
+    .top-bar {
+
+        width: 95vw;
+
+    }
+
+
+    .menu-logo {
+
+        display: none;
+
+    }
+
+
+    .how-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
