@@ -1,85 +1,67 @@
 const c = document.querySelector("#game");
-
 const g = c.getContext("2d");
 
-const mini =
-    document.querySelector("#minimap");
-
-const mg =
-    mini.getContext("2d");
+const mini = document.querySelector("#minimap");
+const mg = mini.getContext("2d");
 
 
 function resize() {
-
     c.width = innerWidth;
-
     c.height = innerHeight;
-
 }
 
-
-addEventListener(
-    "resize",
-    resize
-);
-
+addEventListener("resize", resize);
 resize();
 
 
-
 const mouse = {
-
     x: 0,
     y: 0,
     down: false
-
 };
 
 
 const keys = new Set();
 
-
 let player;
-
 let foods = [];
 
 let cam = {
-
     x: 0,
     y: 0
-
 };
 
-
 let last = 0;
-
 let running = false;
-
-
 
 const imgs = {};
 
 
+/* =========================
+   ЗАГРУЗКА КАРТИНОК ЭВОЛЮЦИЙ
+========================= */
+
 EVOLUTIONS.forEach(e => {
 
-    if (!imgs[e.sprite]) {
+    if (e.sprite && !imgs[e.sprite]) {
 
-        imgs[e.sprite] =
-            new Image();
+        const img = new Image();
 
-        imgs[e.sprite].src =
-            e.sprite;
+        img.src = e.sprite;
 
+        imgs[e.sprite] = img;
     }
 
 });
-
 
 
 const rnd = (a, b) =>
     Math.random() * (b - a) + a;
 
 
+/* =========================
+   БИОМ
+========================= */
 
 function biome(x, y) {
 
@@ -93,76 +75,64 @@ function biome(x, y) {
 }
 
 
+/* =========================
+   ТЕКУЩАЯ ЭВОЛЮЦИЯ
+========================= */
 
 function evo() {
 
-    let e = EVOLUTIONS[0];
+    let current = EVOLUTIONS[0];
 
+    for (const evolution of EVOLUTIONS) {
 
-    for (const x of EVOLUTIONS) {
-
-        if (
-            player.xp >= x.xp
-        ) {
-
-            e = x;
-
+        if (player.xp >= evolution.xp) {
+            current = evolution;
         }
 
     }
 
-
-    return e;
+    return current;
 
 }
 
 
+/* =========================
+   XP АККАУНТА
+========================= */
 
 function getAccountXP() {
 
-    const account =
-        Accounts.getAccount();
-
+    const account = Accounts.getAccount();
 
     if (!account) {
-
         return 0;
-
     }
 
-
-    return Number(
-        account.xp
-    ) || 0;
+    return Number(account.xp) || 0;
 
 }
 
 
+/* =========================
+   СОЗДАНИЕ ИГРОКА
+========================= */
 
 function init() {
 
-    const account =
-        Accounts.getAccount();
+    const account = Accounts.getAccount();
 
-
-    const savedXP =
-        getAccountXP();
-
+    const savedXP = getAccountXP();
 
     player = {
 
         x: 1300,
-
         y: 1700,
 
         xp: savedXP,
 
         hp: 100,
-
         en: 100,
-
         air: 100,
-
         water: 100,
 
         kills: 0,
@@ -179,50 +149,44 @@ function init() {
     foods = [];
 
 
-    for (
-        let i = 0;
-        i < 1500;
-        i++
-    ) {
-
+    for (let i = 0; i < 1500; i++) {
         food();
-
     }
 
 
+    cam.x = player.x;
+    cam.y = player.y;
+
+
     if (
-        typeof AntiCheat !==
-        "undefined"
+        typeof AntiCheat !== "undefined"
     ) {
 
-        AntiCheat.resetChecks(
-            player
-        );
+        AntiCheat.resetChecks(player);
 
     }
 
 
     running = true;
 
+    last = performance.now();
 
-    last =
-        performance.now();
-
-
-    requestAnimationFrame(
-        loop
-    );
+    requestAnimationFrame(loop);
 
 }
 
 
+/* =========================
+   СОЗДАНИЕ ЕДЫ
+========================= */
 
 function food() {
 
     const b =
         BIOMES[
-            Math.random() *
-            BIOMES.length | 0
+            Math.floor(
+                Math.random() * BIOMES.length
+            )
         ];
 
 
@@ -237,7 +201,7 @@ function food() {
             45,
             Math.max(
                 3,
-                current.tier + 5
+                (current.tier || 1) + 5
             )
         );
 
@@ -245,8 +209,7 @@ function food() {
     const tier =
         1 +
         Math.floor(
-            Math.random() *
-            maxTier
+            Math.random() * maxTier
         );
 
 
@@ -266,51 +229,35 @@ function food() {
 
         tier: tier,
 
-        xp:
-            Math.round(
-                8 +
-                tier * 8 +
-                tier * tier * 1.4
-            )
+        xp: Math.round(
+            8 +
+            tier * 8 +
+            tier * tier * 1.4
+        )
 
     });
 
 }
 
 
-
-/* АККАУНТЫ */
-
+/* =========================
+   ЭКРАНЫ И МЕНЮ
+========================= */
 
 const authScreen =
-    document.querySelector(
-        "#authScreen"
-    );
-
+    document.querySelector("#authScreen");
 
 const menu =
-    document.querySelector(
-        "#menu"
-    );
-
+    document.querySelector("#menu");
 
 const authLogin =
-    document.querySelector(
-        "#authLogin"
-    );
-
+    document.querySelector("#authLogin");
 
 const authPassword =
-    document.querySelector(
-        "#authPassword"
-    );
-
+    document.querySelector("#authPassword");
 
 const authMessage =
-    document.querySelector(
-        "#authMessage"
-    );
-
+    document.querySelector("#authMessage");
 
 
 function openMenu() {
@@ -320,105 +267,128 @@ function openMenu() {
 
 
     if (!account) {
-
         return;
+    }
+
+
+    if (authScreen) {
+        authScreen.classList.add("hidden");
+    }
+
+
+    if (menu) {
+        menu.classList.remove("hidden");
+    }
+
+
+    const accountInfo =
+        document.querySelector("#accountInfo");
+
+
+    if (accountInfo) {
+
+        accountInfo.textContent =
+            "👤 " +
+            account.nickname +
+            " | Уровень " +
+            account.level +
+            "/45 | " +
+            Math.floor(account.xp) +
+            " XP";
 
     }
 
 
-    authScreen.classList.add(
-        "hidden"
-    );
+    if (
+        typeof Accounts.updateMenu ===
+        "function"
+    ) {
 
+        Accounts.updateMenu();
 
-    menu.classList.remove(
-        "hidden"
-    );
-
-
-    document.querySelector(
-        "#nickname"
-    ).value =
-        account.nickname;
-
-
-    document.querySelector(
-        "#accountInfo"
-    ).textContent =
-        "👤 " +
-        Accounts.current +
-        " | Уровень " +
-        account.level +
-        "/45 | " +
-        Math.floor(
-            account.xp
-        ) +
-        " XP";
+    }
 
 }
 
 
+/* =========================
+   РЕГИСТРАЦИЯ
+========================= */
 
-/* РЕГИСТРАЦИЯ */
-
-
-document.querySelector(
-    "#registerBtn"
-).onclick = () => {
-
-    const result =
-        Accounts.register(
-            authLogin.value,
-            authPassword.value
-        );
+const registerBtn =
+    document.querySelector("#registerBtn");
 
 
-    authMessage.textContent =
-        result.message;
+if (registerBtn) {
+
+    registerBtn.onclick = () => {
+
+        const result =
+            Accounts.register(
+                authLogin.value,
+                authPassword.value
+            );
 
 
-    if (result.ok) {
-
-        openMenu();
-
-    }
-
-};
+        if (authMessage) {
+            authMessage.textContent =
+                result.message;
+        }
 
 
+        if (result.ok) {
 
-/* ВХОД */
+            openMenu();
 
+        }
 
-document.querySelector(
-    "#loginBtn"
-).onclick = () => {
+    };
 
-    const result =
-        Accounts.login(
-            authLogin.value,
-            authPassword.value
-        );
+}
 
 
-    authMessage.textContent =
-        result.message;
+/* =========================
+   ВХОД
+========================= */
+
+const loginBtn =
+    document.querySelector("#loginBtn");
 
 
-    if (result.ok) {
+if (loginBtn) {
 
-        openMenu();
+    loginBtn.onclick = () => {
 
-    }
+        const result =
+            Accounts.login(
+                authLogin.value,
+                authPassword.value
+            );
 
-};
+
+        if (authMessage) {
+            authMessage.textContent =
+                result.message;
+        }
 
 
+        if (result.ok) {
 
-/* АВТОВХОД */
+            openMenu();
 
+        }
+
+    };
+
+}
+
+
+/* =========================
+   АВТОВХОД
+========================= */
 
 if (
+    typeof Accounts !== "undefined" &&
     Accounts.autoLogin()
 ) {
 
@@ -427,113 +397,126 @@ if (
 }
 
 
+/* =========================
+   ВЫХОД ИЗ АККАУНТА
+========================= */
 
-/* ВЫХОД */
-
-
-document.querySelector(
-    "#logoutBtn"
-).onclick = () => {
-
-    Accounts.logout();
+const logoutBtn =
+    document.querySelector("#logoutBtn");
 
 
-    running = false;
+if (logoutBtn) {
+
+    logoutBtn.onclick = () => {
+
+        Accounts.logout();
+
+        running = false;
 
 
-    menu.classList.add(
-        "hidden"
-    );
+        if (menu) {
+            menu.classList.add("hidden");
+        }
 
 
-    authLogin.value = "";
+        const hud =
+            document.querySelector("#hud");
 
-    authPassword.value = "";
-
-
-    authScreen.classList.remove(
-        "hidden"
-    );
-
-};
+        if (hud) {
+            hud.classList.add("hidden");
+        }
 
 
+        const minimapBox =
+            document.querySelector("#minimapBox");
 
-/* ЗАПУСК ИГРЫ */
-
-
-document.querySelector(
-    "#play"
-).onclick = () => {
-
-    const name =
-        document.querySelector(
-            "#nickname"
-        ).value.trim() ||
-        "Игрок";
+        if (minimapBox) {
+            minimapBox.classList.add("hidden");
+        }
 
 
-    const account =
-        Accounts.getAccount();
+        if (authLogin) {
+            authLogin.value = "";
+        }
+
+        if (authPassword) {
+            authPassword.value = "";
+        }
 
 
-    if (account) {
+        if (authScreen) {
+            authScreen.classList.remove("hidden");
+        }
 
-        account.nickname =
-            name;
+    };
 
-
-        const all =
-            Accounts.getAll();
-
-
-        all[
-            Accounts.current
-        ] = account;
+}
 
 
-        Accounts.saveAll(
-            all
-        );
+/* =========================
+   КНОПКА ИГРАТЬ
+========================= */
 
-    }
-
-
-    menu.classList.add(
-        "hidden"
-    );
+const playButton =
+    document.querySelector("#play");
 
 
-    document.querySelector(
-        "#hud"
-    ).classList.remove(
-        "hidden"
-    );
+if (playButton) {
+
+    playButton.onclick = () => {
+
+        const account =
+            Accounts.getAccount();
 
 
-    document.querySelector(
-        "#minimapBox"
-    ).classList.remove(
-        "hidden"
-    );
+        if (!account) {
+
+            if (authMessage) {
+                authMessage.textContent =
+                    "Сначала войдите в аккаунт";
+            }
+
+            return;
+
+        }
 
 
-    init();
+        if (menu) {
+            menu.classList.add("hidden");
+        }
 
-};
+
+        const hud =
+            document.querySelector("#hud");
+
+        if (hud) {
+            hud.classList.remove("hidden");
+        }
 
 
+        const minimapBox =
+            document.querySelector("#minimapBox");
 
-/* УПРАВЛЕНИЕ */
+        if (minimapBox) {
+            minimapBox.classList.remove("hidden");
+        }
 
+
+        init();
+
+    };
+
+}
+
+
+/* =========================
+   УПРАВЛЕНИЕ МЫШЬЮ
+========================= */
 
 c.onmousemove = e => {
 
-    mouse.x =
-        e.clientX;
-
-    mouse.y =
-        e.clientY;
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
 
 };
 
@@ -555,13 +538,15 @@ addEventListener(
 );
 
 
+/* =========================
+   КЛАВИАТУРА
+========================= */
+
 addEventListener(
     "keydown",
     e => {
 
-        keys.add(
-            e.code
-        );
+        keys.add(e.code);
 
     }
 );
@@ -571,26 +556,27 @@ addEventListener(
     "keyup",
     e => {
 
-        keys.delete(
-            e.code
-        );
+        keys.delete(e.code);
 
     }
 );
 
 
+/* =========================
+   ОБНОВЛЕНИЕ ИГРЫ
+========================= */
 
 function update(dt) {
 
+    if (!player) {
+        return;
+    }
+
+
     const e = evo();
 
-
-    const oldX =
-        player.x;
-
-
-    const oldY =
-        player.y;
+    const oldX = player.x;
+    const oldY = player.y;
 
 
     const b =
@@ -601,10 +587,10 @@ function update(dt) {
 
 
     let dx = 0;
-
     let dy = 0;
 
 
+    /* ДВИЖЕНИЕ МЫШЬЮ */
 
     if (mouse.down) {
 
@@ -619,48 +605,27 @@ function update(dt) {
     }
 
 
-    if (
-        keys.has("KeyA")
-    ) {
+    /* WASD */
 
+    if (keys.has("KeyA")) {
         dx -= 220;
-
     }
 
-
-    if (
-        keys.has("KeyD")
-    ) {
-
+    if (keys.has("KeyD")) {
         dx += 220;
-
     }
 
-
-    if (
-        keys.has("KeyW")
-    ) {
-
+    if (keys.has("KeyW")) {
         dy -= 220;
-
     }
 
-
-    if (
-        keys.has("KeyS")
-    ) {
-
+    if (keys.has("KeyS")) {
         dy += 220;
-
     }
-
 
 
     const d =
-        Math.hypot(
-            dx,
-            dy
-        );
+        Math.hypot(dx, dy);
 
 
     const boost =
@@ -668,11 +633,10 @@ function update(dt) {
         player.en > 0;
 
 
-
-    if (d) {
+    if (d > 0) {
 
         let speed =
-            e.speed *
+            (e.speed || 180) *
             (
                 boost ?
                 1.5 :
@@ -703,14 +667,12 @@ function update(dt) {
 
 
         player.angle =
-            Math.atan2(
-                dy,
-                dx
-            );
+            Math.atan2(dy, dx);
 
     }
 
 
+    /* ГРАНИЦЫ МИРА */
 
     player.x =
         Math.max(
@@ -732,29 +694,27 @@ function update(dt) {
         );
 
 
-
     /* ЭНЕРГИЯ */
-
 
     player.en =
         Math.max(
             0,
             Math.min(
                 100,
+
                 player.en +
+
                 (
                     boost ?
                     -28 :
                     15
-                ) *
-                dt
+                ) * dt
+
             )
         );
 
 
-
     /* ВОЗДУХ */
-
 
     if (
         b.kind === "water" &&
@@ -790,9 +750,7 @@ function update(dt) {
     }
 
 
-
     /* ВОДА */
-
 
     player.water =
         Math.max(
@@ -826,50 +784,37 @@ function update(dt) {
     }
 
 
-
-    /* ЕДА */
-
+    /* ПОЕДАНИЕ ЕДЫ */
 
     for (
-        let i =
-            foods.length - 1;
-
+        let i = foods.length - 1;
         i >= 0;
-
         i--
     ) {
 
-        const f =
-            foods[i];
+        const f = foods[i];
 
 
         const distance =
             Math.hypot(
-                f.x -
-                player.x,
-
-                f.y -
-                player.y
+                f.x - player.x,
+                f.y - player.y
             );
 
 
         if (
+
             distance <
-            e.r + f.r &&
+            (e.r || 20) + f.r &&
 
             f.tier <=
-            e.tier + 1
+            (e.tier || 1) + 1
+
         ) {
 
-            player.xp +=
-                f.xp;
+            player.xp += f.xp;
 
-
-            foods.splice(
-                i,
-                1
-            );
-
+            foods.splice(i, 1);
 
             food();
 
@@ -878,9 +823,7 @@ function update(dt) {
     }
 
 
-
     /* СМЕРТЬ */
-
 
     if (
         player.hp <= 0
@@ -888,36 +831,31 @@ function update(dt) {
 
         player.hp = 100;
 
+        player.en = 100;
+        player.air = 100;
+        player.water = 100;
+
 
         player.xp =
             Math.floor(
-                player.xp *
-                0.90
+                player.xp * 0.90
             );
 
 
-        player.x =
-            1300;
-
-
-        player.y =
-            1700;
+        player.x = 1300;
+        player.y = 1700;
 
     }
 
 
-
     /* АНТИЧИТ */
-
 
     if (
         typeof AntiCheat !==
         "undefined"
     ) {
 
-        AntiCheat.clampPlayer(
-            player
-        );
+        AntiCheat.clampPlayer(player);
 
 
         AntiCheat.validateMovement(
@@ -925,30 +863,24 @@ function update(dt) {
             oldX,
             oldY,
             dt,
-            e.speed
+            e.speed || 180
         );
 
 
-        AntiCheat.saveSafeXP(
-            player
-        );
+        AntiCheat.saveSafeXP(player);
 
     }
 
 
-
-    /* СОХРАНЕНИЕ АККАУНТА */
-
+    /* СОХРАНЕНИЕ */
 
     Accounts.saveProgress(
-
         player.xp,
-
         player.nickname
-
     );
 
 
+    /* КАМЕРА */
 
     cam.x +=
 
@@ -978,6 +910,9 @@ function update(dt) {
 }
 
 
+/* =========================
+   МИРОВЫЕ КООРДИНАТЫ
+========================= */
 
 function sc(x, y) {
 
@@ -996,12 +931,18 @@ function sc(x, y) {
 }
 
 
+/* =========================
+   ОТРИСОВКА
+========================= */
 
 function draw() {
 
-    g.fillStyle =
-        "#78c8e6";
+    if (!player) {
+        return;
+    }
 
+
+    g.fillStyle = "#78c8e6";
 
     g.fillRect(
         0,
@@ -1011,20 +952,15 @@ function draw() {
     );
 
 
+    /* БИОМЫ */
 
-    for (
-        const b of BIOMES
-    ) {
+    for (const b of BIOMES) {
 
         const p =
-            sc(
-                b.x,
-                b.y
-            );
+            sc(b.x, b.y);
 
 
-        g.fillStyle =
-            b.color;
+        g.fillStyle = b.color;
 
 
         g.fillRect(
@@ -1037,23 +973,16 @@ function draw() {
     }
 
 
+    /* ЕДА */
 
-    for (
-        const f of foods
-    ) {
+    for (const f of foods) {
 
         const p =
-            sc(
-                f.x,
-                f.y
-            );
+            sc(f.x, f.y);
 
 
         const hue =
-            (
-                f.tier * 31
-            ) %
-            360;
+            (f.tier * 31) % 360;
 
 
         g.fillStyle =
@@ -1077,9 +1006,9 @@ function draw() {
     }
 
 
+    /* ИГРОК */
 
-    const e =
-        evo();
+    const e = evo();
 
 
     const p =
@@ -1090,63 +1019,54 @@ function draw() {
 
 
     const im =
-        imgs[
-            e.sprite
-        ];
-
+        imgs[e.sprite];
 
 
     g.save();
-
 
     g.translate(
         p[0],
         p[1]
     );
 
-
     g.rotate(
         player.angle
     );
 
 
-
     if (
         im &&
-        im.complete
+        im.complete &&
+        im.naturalWidth > 0
     ) {
 
         g.drawImage(
 
             im,
 
-            -e.r * 1.45,
+            -(e.r || 20) * 1.45,
 
-            -e.r,
+            -(e.r || 20),
 
-            e.r * 2.9,
+            (e.r || 20) * 2.9,
 
-            e.r * 2
+            (e.r || 20) * 2
 
         );
 
     } else {
 
-        g.fillStyle =
-            "#ffffff";
-
+        g.fillStyle = "#ffffff";
 
         g.beginPath();
-
 
         g.arc(
             0,
             0,
-            e.r,
+            e.r || 20,
             0,
             Math.PI * 2
         );
-
 
         g.fill();
 
@@ -1156,9 +1076,9 @@ function draw() {
     g.restore();
 
 
+    /* HUD */
 
-    const level =
-        e.level;
+    const level = e.level || 1;
 
 
     const next =
@@ -1170,98 +1090,104 @@ function draw() {
         ];
 
 
-
-    const pct =
-        level >= 45 ?
-
-        100 :
-
-        (
-            player.xp -
-            e.xp
-        ) /
-
-        (
-            next.xp -
-            e.xp
-        ) *
-
-        100;
+    let pct = 100;
 
 
+    if (
+        level < 45 &&
+        next &&
+        next.xp > e.xp
+    ) {
 
-    document.querySelector(
-        "#formName"
-    ).textContent =
+        pct =
 
-        player.nickname +
+            (
+                player.xp -
+                e.xp
+            )
 
-        " | Уровень " +
+            /
 
-        level +
+            (
+                next.xp -
+                e.xp
+            )
 
-        "/45 | " +
-
-        e.name +
-
-        " | " +
-
-        Math.floor(
-            player.xp
-        ) +
-
-        " XP";
-
-
-
-    document.querySelector(
-        "#hp"
-    ).style.width =
-
-        Math.max(
-            0,
-            player.hp
-        ) + "%";
-
-
-
-    document.querySelector(
-        "#energy"
-    ).style.width =
-
-        player.en + "%";
-
-
-
-    document.querySelector(
-        "#air"
-    ).style.width =
-
-        player.air + "%";
-
-
-
-    const water =
-        document.querySelector(
-            "#water"
-        );
-
-
-    if (water) {
-
-        water.style.width =
-            player.water +
-            "%";
+            * 100;
 
     }
 
 
+    const formName =
+        document.querySelector("#formName");
+
+
+    if (formName) {
+
+        formName.textContent =
+
+            player.nickname +
+
+            " | Уровень " +
+
+            level +
+
+            "/45 | " +
+
+            (e.name || "Эволюция") +
+
+            " | " +
+
+            Math.floor(
+                player.xp
+            ) +
+
+            " XP";
+
+    }
+
+
+    const hp =
+        document.querySelector("#hp");
+
+    if (hp) {
+        hp.style.width =
+            Math.max(
+                0,
+                player.hp
+            ) + "%";
+    }
+
+
+    const energy =
+        document.querySelector("#energy");
+
+    if (energy) {
+        energy.style.width =
+            player.en + "%";
+    }
+
+
+    const air =
+        document.querySelector("#air");
+
+    if (air) {
+        air.style.width =
+            player.air + "%";
+    }
+
+
+    const water =
+        document.querySelector("#water");
+
+    if (water) {
+        water.style.width =
+            player.water + "%";
+    }
+
 
     const xp =
-        document.querySelector(
-            "#xp"
-        );
-
+        document.querySelector("#xp");
 
     if (xp) {
 
@@ -1273,23 +1199,23 @@ function draw() {
                     100,
                     pct
                 )
-            ) +
-
-            "%";
+            ) + "%";
 
     }
 
 
+    const biomeText =
+        document.querySelector("#biome");
 
-    document.querySelector(
-        "#biome"
-    ).textContent =
+    if (biomeText) {
 
-        biome(
-            player.x,
-            player.y
-        ).name;
+        biomeText.textContent =
+            biome(
+                player.x,
+                player.y
+            ).name;
 
+    }
 
 
     drawMini();
@@ -1297,31 +1223,36 @@ function draw() {
 }
 
 
+/* =========================
+   МИНИКАРТА
+========================= */
 
 function drawMini() {
+
+    if (!player) {
+        return;
+    }
+
 
     mg.clearRect(
         0,
         0,
-        180,
-        110
+        mini.width,
+        mini.height
     );
 
 
     const sx =
-        180 /
+        mini.width /
         WORLD.w;
 
 
     const sy =
-        110 /
+        mini.height /
         WORLD.h;
 
 
-
-    for (
-        const b of BIOMES
-    ) {
+    for (const b of BIOMES) {
 
         mg.fillStyle =
             b.color;
@@ -1330,17 +1261,14 @@ function drawMini() {
         mg.fillRect(
 
             b.x * sx,
-
             b.y * sy,
 
             b.w * sx,
-
             b.h * sy
 
         );
 
     }
-
 
 
     mg.fillStyle =
@@ -1353,13 +1281,11 @@ function drawMini() {
     mg.arc(
 
         player.x * sx,
-
         player.y * sy,
 
         3,
 
         0,
-
         Math.PI * 2
 
     );
@@ -1370,17 +1296,19 @@ function drawMini() {
 }
 
 
+/* =========================
+   ГЛАВНЫЙ ИГРОВОЙ ЦИКЛ
+========================= */
 
 function loop(t) {
 
     if (!running) {
-
         return;
-
     }
 
 
     const dt =
+
         Math.min(
 
             0.05,
@@ -1388,9 +1316,7 @@ function loop(t) {
             (
                 t -
                 last
-            ) /
-
-            1000
+            ) / 1000
 
         );
 
@@ -1400,12 +1326,9 @@ function loop(t) {
 
     update(dt);
 
-
     draw();
 
 
-    requestAnimationFrame(
-        loop
-    );
+    requestAnimationFrame(loop);
 
 }
